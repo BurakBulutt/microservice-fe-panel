@@ -26,12 +26,6 @@ const Users = () => {
 
   useEffect(() => {
     if (keycloak.authenticated) {
-      getUsers(page, rowsPerPage);
-    }
-  }, [count]);
-
-  useEffect(() => {
-    if (keycloak.authenticated) {
       getCount();
     }
   }, [keycloak.authenticated]);
@@ -54,6 +48,7 @@ const Users = () => {
     service.usersCount().then((response) => {
       if (response.status === 200) {
         setCount(response.data);
+        getUsers(page, rowsPerPage);
       }
       console.log(response);
     });
@@ -99,7 +94,9 @@ const Users = () => {
           toast.success("Update Success", {
             position: "top-center",
             autoClose: 3000,
-            onClose: getUsers(page,rowsPerPage),
+            onClose: () => {
+                getUsers(page,rowsPerPage)
+            },
           });
           hideDialog();
         }
@@ -107,6 +104,11 @@ const Users = () => {
       .catch((err) => {
         if (err.status === 404) {
           toast.error(`User Not Found -> ${request.id}`, {
+            position: "top-center",
+            autoClose: 3000,
+          });
+        }else if (err.status === 409) {
+          toast.error(`Email Exists`, {
             position: "top-center",
             autoClose: 3000,
           });

@@ -11,7 +11,7 @@ export default function Admin(props) {
   const location = useLocation();
   const [open, setOpen] = React.useState(true);
   const [currentRoute, setCurrentRoute] = React.useState("Main Dashboard");
-  const {keycloak} = useKeycloak();
+  const {keycloak,initialized} = useKeycloak();
 
   React.useEffect(() => {
     window.addEventListener("resize", () =>
@@ -23,8 +23,16 @@ export default function Admin(props) {
   }, [location.pathname]);
 
   React.useEffect(() => {
+    if (initialized) {
+      if (!keycloak.authenticated) {
+        keycloak.login();
+      }
+    }
+  },[initialized]);
+
+  React.useEffect(() => {
     const intervalId = setInterval(() => {
-      if (keycloak) {
+      if (keycloak.authenticated) {
         keycloak.updateToken(300)
             .then((refreshed) => {
               if (refreshed) {
@@ -35,12 +43,13 @@ export default function Admin(props) {
             })
             .catch(() => {
               console.error('Failed to refresh token');
+              keycloak.login();
             });
       }
     }, 4 * 60 * 1000);
 
     return () => clearInterval(intervalId);
-  }, [keycloak]);
+  }, [keycloak.authenticated]);
 
   const getActiveRoute = (routes) => {
     let activeRoute = "Main Dashboard";

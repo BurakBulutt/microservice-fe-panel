@@ -9,9 +9,9 @@ import {keycloakConfig} from "./utils/keycloak/keycloakconfig";
 
 const App = () => {
   const initOptions = {
-    onLoad: "login-required",
+    onLoad: "check-sso",
     pkceMethod: "S256",
-    checkLoginIframe: false,
+    checkLoginIframe: true,
     silentCheckSsoRedirectUri: window.location.origin + "/silent-check-sso.html",
   };
 
