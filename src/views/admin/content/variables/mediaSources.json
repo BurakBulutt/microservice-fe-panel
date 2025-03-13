@@ -1,0 +1,14 @@
+[
+  {
+    "url": "www.link.com",
+    "type": "GOOGLE_DRIVE",
+    "mediaId": "506a9c3d-8ea6-4982-989c-d955625ddff2",
+    "fanSub": "seicode"
+  },
+  {
+    "url": "www.linkdail.com",
+    "type": "DAILMATION",
+    "mediaId": "506a9c3d-8ea6-4982-989c-d955625ddff2",
+    "fanSub": "seicode"
+  }
+]

@@ -1,6 +1,7 @@
 import { Dialog } from "@headlessui/react";
 import React from "react";
 import Switch from "../../../../components/switch";
+import InputField from "../../../../components/fields/InputField";
 
 const UserDialog = (props) => {
   const {formik,dialogVisible,hideDialog,submitted,handleSubmitFormik} = props;
@@ -20,87 +21,93 @@ const UserDialog = (props) => {
             {formik.values?.id ? "Kullanıcı Düzenle" : "Kullanıcı Oluştur"}
           </Dialog.Title>
           <div className="mb-4">
-            <label className="block text-gray-700">Ad</label>
-            <input
-              type="text"
-              name="firstName"
-              onChange={formik.handleChange}
-              value={formik.values.firstName}
-              className="w-full rounded-md border px-3 py-2"
+            <InputField
+                label="Ad"
+                placeholder="First Name"
+                name="firstName"
+                type="text"
+                state={formik.errors?.firstName && "error"}
+                value={formik.values?.firstName}
+                onChange={formik.handleChange}
             />
-            {formik.errors.firstName && dialogVisible && (
+            {formik.errors.firstName && (
               <div className="text-red-500">{formik.errors.firstName}</div>
             )}
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Soyad</label>
-            <input
-              type="text"
-              name="lastName"
-              onChange={formik.handleChange}
-              value={formik.values.lastName}
-              className="w-full rounded-md border px-3 py-2"
+            <InputField
+                label="Soyad"
+                placeholder="Last Name"
+                name="lastName"
+                type="text"
+                state={formik.errors?.lastName && "error"}
+                value={formik.values?.lastName}
+                onChange={formik.handleChange}
             />
-            {formik.errors.lastName && dialogVisible && (
+            {formik.errors.lastName && (
               <div className="text-red-500">{formik.errors.lastName}</div>
             )}
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Email</label>
-            <input
-              type="email"
-              name="email"
-              onChange={formik.handleChange}
-              value={formik.values.email}
-              className="w-full rounded-md border px-3 py-2"
+            <InputField
+                label="Email"
+                placeholder="Email"
+                name="email"
+                type="email"
+                state={formik.errors?.email && "error"}
+                value={formik.values?.email}
+                onChange={formik.handleChange}
             />
-            {formik.errors.email && dialogVisible && (
+            {formik.errors.email && (
               <div className="text-red-500">{formik.errors.email}</div>
             )}
           </div>
           {!formik.values?.id && (
             <>
               <div className="mb-4">
-                <label className="block text-gray-700">Kullanıcı Adı</label>
-                <input
-                  type="text"
-                  name="username"
-                  onChange={formik.handleChange}
-                  value={formik.values.username}
-                  className="w-full rounded-md border px-3 py-2"
+                <InputField
+                    label="Kullanıcı Adı"
+                    placeholder="Kullanıcı Adı"
+                    name="username"
+                    type="text"
+                    state={formik.errors?.username && "error"}
+                    value={formik.values?.username}
+                    onChange={formik.handleChange}
                 />
-                {formik.errors.username && dialogVisible && (
+                {formik.errors.username && (
                   <div className="text-red-500">{formik.errors.username}</div>
                 )}
               </div>
               <div className="mb-4">
-                <label className="block text-gray-700">Şifre</label>
-                <input
-                  type="password"
-                  name="password"
-                  onChange={formik.handleChange}
-                  value={formik.values.password}
-                  className="w-full rounded-md border px-3 py-2"
+                <InputField
+                    label="Şifre"
+                    placeholder="Şifre"
+                    name="password"
+                    type="password"
+                    state={formik.errors?.password && "error"}
+                    value={formik.values?.password}
+                    onChange={formik.handleChange}
                 />
-                {formik.errors.password && dialogVisible && (
+                {formik.errors.password && (
                   <div className="text-red-500">{formik.errors.password}</div>
                 )}
               </div>
               <div className="mb-4">
-                <label className="block text-gray-700">Şifre Tekrar</label>
-                <input
-                  type="password"
-                  name="passwordRe"
-                  onChange={formik.handleChange}
-                  value={formik.values.passwordRe}
-                  className="w-full rounded-md border px-3 py-2"
+                <InputField
+                    label="Şifre Tekrar"
+                    placeholder="Şifre Tekrar"
+                    name="passwordRe"
+                    type="password"
+                    state={formik.errors?.passwordRe && "error"}
+                    value={formik.values?.passwordRe}
+                    onChange={formik.handleChange}
                 />
-                {formik.errors.passwordRe && dialogVisible && (
+                {formik.errors.passwordRe && (
                     <div className="text-red-500">{formik.errors.passwordRe}</div>
                 )}
               </div>
               <div className="mb-4">
-                <label className="block text-gray-700">Geçici Şifre</label>
+                <label className="mb-2 block text-sm font-bold text-navy-700 dark:text-white">Geçici Şifre</label>
                 <Switch
                   id="isPasswordTemporary"
                   checked={formik.values.isPasswordTemporary}
@@ -112,7 +119,7 @@ const UserDialog = (props) => {
             </>
           )}
           <div className="mb-4">
-            <label className="block text-gray-700">Aktif</label>
+            <label className="mb-2 block text-sm font-bold text-navy-700 dark:text-white">Aktif</label>
             <Switch
                 id="enabled"
                 checked={formik.values.enabled}
@@ -122,7 +129,7 @@ const UserDialog = (props) => {
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Email Doğrulanmış</label>
+            <label className="mb-2 block text-sm font-bold text-navy-700 dark:text-white">Email Doğrulanmış</label>
             <Switch
                 id="emailVerified"
                 checked={formik.values.emailVerified}
@@ -132,15 +139,16 @@ const UserDialog = (props) => {
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Doğum Tarihi</label>
-            <input
-                type="birthdate"
+            <InputField
+                label="Doğum Tarihi"
+                placeholder="Doğum Tarihi"
                 name="birthdate"
+                type="date"
+                state={formik.errors?.birthdate && "error"}
+                value={formik.values?.birthdate}
                 onChange={formik.handleChange}
-                value={formik.values.birthdate}
-                className="w-full rounded-md border px-3 py-2"
             />
-            {formik.errors.birthdate && dialogVisible && (
+            {formik.errors.birthdate  && (
                 <div className="text-red-500">{formik.errors.birthdate}</div>
             )}
           </div>

@@ -1,0 +1,147 @@
+import { contentsColumnsData } from "../../../components/table/columnsData";
+import React, { useEffect, useState } from "react";
+import { FaEdit, FaTrash } from "react-icons/fa";
+import { toast } from "react-toastify";
+import { useLocation, useNavigate } from "react-router-dom";
+import { ContentService } from "../../../service/ContentService";
+import { useKeycloak } from "@react-keycloak/web";
+import DefaultTable from "../../../components/table/CheckTable";
+
+const Content = (props) => {
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [contents, setContents] = useState(undefined);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { keycloak } = useKeycloak();
+  const service = new ContentService(keycloak);
+  const [page, setPage] = useState(0);
+  const [size, setSize] = useState(10);
+
+  useEffect(() => {
+    if (keycloak.authenticated) {
+      getContents({ page: page, size: size });
+    }
+  }, [keycloak.authenticated]);
+
+  useEffect(() => {
+    if (contents !== undefined) {
+      getContents({ page: page, size: size });
+    }
+  }, [page, size]);
+
+  const getContents = (params) => {
+    service.getAll(params).then((response) => {
+      if (response.status === 200) {
+        setContents(response.data);
+      }
+    });
+  };
+
+  const handleCreate = () => {
+    navigate(location.pathname + "/create");
+  };
+  const handleUpdate = (data) => {
+    navigate(location.pathname + `/update/${data.id}`);
+  };
+  const handleDelete = (id) => {
+    service.delete(id).then((response) => {
+      if (response.status === 200) {
+        toast.success("Delete Success", {
+          position: "top-center",
+          autoClose: 3000,
+          onClose: getContents,
+        });
+      }
+    });
+  };
+
+  const handleSelect = (e, id) => {
+    if (e.target.checked) {
+      setSelectedItems([...selectedItems, id]);
+    } else {
+      setSelectedItems(selectedItems.filter((item) => item !== id));
+    }
+  };
+
+  const handleMultipleSelect = (e, targets) => {
+    if (e.target.checked) {
+      setSelectedItems((prev) => [...new Set([...prev, ...targets])]);
+    } else {
+      setSelectedItems((prev) =>
+        prev.filter((item) => !targets.includes(item))
+      );
+    }
+  };
+
+  const handlePageChange = (page) => {
+    setPage(page);
+  };
+
+  const handleOnRowsPerPageChange = (size) => {
+    setSize(size);
+  };
+
+  const header = () => {
+    return (
+      <div className="flex items-center justify-between space-x-4 py-4">
+        <button
+          className="rounded-xl bg-green-500 px-5 py-3 text-base font-bold text-white transition duration-200 hover:bg-green-600 active:bg-green-700 dark:bg-green-400 dark:text-white dark:hover:bg-green-300 dark:active:bg-green-200"
+          onClick={() => {
+            handleCreate();
+          }}
+        >
+          Yeni
+        </button>
+
+        <button
+          className={`rounded-xl px-5 py-3 text-base font-bold text-white transition duration-200 dark:text-white dark:hover:bg-red-300 dark:active:bg-red-200 
+                    ${
+                      selectedItems.length === 0
+                        ? "cursor-not-allowed bg-red-300"
+                        : "bg-red-500 hover:bg-red-600 active:bg-red-700 dark:bg-red-400"
+                    }`}
+          onClick={() => {
+            console.log(selectedItems);
+          }}
+        >
+          Toplu Sil
+        </button>
+      </div>
+    );
+  };
+  const actionButtons = (data) => {
+    return (
+      <div className="flex space-x-2">
+        <button
+          className="flex cursor-pointer items-center justify-center rounded-lg bg-blue-500 p-2 text-white hover:bg-blue-600"
+          onClick={() => handleUpdate(data)}
+          aria-label="Güncelle"
+        >
+          <FaEdit size={24} />
+        </button>
+        <button
+          className="flex cursor-pointer items-center justify-center rounded-lg bg-red-500 p-2 text-white hover:bg-red-600"
+          onClick={() => handleDelete(data.id)}
+          aria-label="Veriyi Sil"
+        >
+          <FaTrash size={24} />
+        </button>
+      </div>
+    );
+  };
+
+  return (
+    <DefaultTable
+      header={header}
+      columnsData={contentsColumnsData}
+      tableData={contents}
+      selectedItems={selectedItems}
+      actionButtons={actionButtons}
+      handleSelect={handleSelect}
+      handleMultipleSelect={handleMultipleSelect}
+      handlePageChange={handlePageChange}
+      handleOnRowsPerPageChange={handleOnRowsPerPageChange}
+    />
+  );
+};
+export default Content;

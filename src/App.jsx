@@ -6,6 +6,8 @@ import AdminLayout from "layouts/admin";
 import AuthLayout from "layouts/auth";
 import {ReactKeycloakProvider} from "@react-keycloak/web";
 import {keycloakConfig} from "./utils/keycloak/keycloakconfig";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const App = () => {
   const initOptions = {
@@ -23,6 +25,7 @@ const App = () => {
         <Route path="rtl/*" element={<RtlLayout />} />
         <Route path="/" element={<Navigate to="/admin" replace />} />
       </Routes>
+      <ToastContainer />
     </ReactKeycloakProvider>
   );
 };

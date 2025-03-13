@@ -15,7 +15,7 @@ export class UserService {
       "GET",
       null,
       params,
-      this.keycloak.token
+      this.keycloak
     );
   }
 
@@ -25,7 +25,7 @@ export class UserService {
         "POST",
         request,
         null,
-        this.keycloak.token
+        this.keycloak
     );
   }
 
@@ -35,7 +35,7 @@ export class UserService {
         "PUT",
         request,
         null,
-        this.keycloak.token
+        this.keycloak
     );
   }
 
@@ -45,7 +45,7 @@ export class UserService {
         "DELETE",
         null,
         null,
-        this.keycloak.token
+        this.keycloak
     );
   }
 
@@ -55,7 +55,7 @@ export class UserService {
         "POST",
         null,
         null,
-        this.keycloak.token
+        this.keycloak
     );
   }
 
@@ -65,7 +65,7 @@ export class UserService {
         "POST",
         null,
         null,
-        this.keycloak.token
+        this.keycloak
     );
   }
 
@@ -75,7 +75,7 @@ export class UserService {
         "GET",
         null,
         null,
-        this.keycloak.token
+        this.keycloak
     );
   }
 }

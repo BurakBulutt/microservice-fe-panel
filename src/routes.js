@@ -20,6 +20,12 @@ import {
 } from "react-icons/md";
 
 import Users from "./views/admin/users";
+import Content from "./views/admin/content";
+import ContentCard from "./views/admin/content/components/contentcard";
+import Comment from "./views/admin/comment";
+import Category from "./views/admin/category";
+import {SiContentful} from "react-icons/si";
+import {BiCategory, BiComment, BiUser} from "react-icons/bi";
 
 const routes = [
   {
@@ -65,13 +71,47 @@ const routes = [
     icon: <MdHome className="h-6 w-6" />,
     component: <RTLDefault />,
   },
-
   {
     name: "User",
     layout: "/admin",
     path: "users",
-    icon: <MdHome className="h-6 w-6" />,
+    icon: <BiUser className="h-6 w-6" />,
     component: <Users />,
+  },
+  {
+    name: "Content",
+    layout: "/admin",
+    path: "contents",
+    icon: <SiContentful className="h-6 w-6" />,
+    component: <Content />,
+    childRoutes: [
+      {
+        name: "Create Content",
+        layout: "/admin",
+        path: "contents/create",
+        component: <ContentCard />
+      },
+      {
+        name: "Update Content",
+        layout: "/admin",
+        path: "contents/update/:id",
+        component: <ContentCard />
+      }
+    ]
+  },
+  {
+    name: "Comment",
+    layout: "/admin",
+    path: "comments",
+    icon: <BiComment className="h-6 w-6" />,
+    component: <Comment />,
+  },
+  {
+    name: "Category",
+    layout: "/admin",
+    path: "categories",
+    icon: <BiCategory className="h-6 w-6" />,
+    component: <Category />,
   },
 ];
 export default routes;

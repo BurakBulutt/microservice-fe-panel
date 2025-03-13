@@ -1,5 +1,4 @@
-import CheckTable from "../tables/components/CheckTable";
-import { usersColumnsData } from "../tables/variables/columnsData";
+import { usersColumnsData } from "../../../components/table/columnsData";
 import { FaEdit, FaMailBulk, FaTrash, FaUserLock } from "react-icons/fa";
 import React, { useEffect, useState } from "react";
 import { UserService } from "../../../service/UserService";
@@ -11,24 +10,39 @@ import {
   UserCreateValidationSchema,
   UserUpdateValidationSchema,
 } from "../../../utils/validation/ValidationSchemas";
+import DefaultTable from "../../../components/table/CheckTable";
 
-const Users = () => {
+const Users = (props) => {
   const { keycloak } = useKeycloak();
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState(undefined);
   const [selectedItems, setSelectedItems] = useState([]);
   const [dialogVisible, setDialogVisible] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [validationSchema, setValidationSchema] = useState(UserCreateValidationSchema);
+  const [validationSchema, setValidationSchema] = useState(
+    UserCreateValidationSchema
+  );
   const service = new UserService(keycloak);
   const [count, setCount] = useState(0);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [size, setSize] = useState(10);
 
   useEffect(() => {
     if (keycloak.authenticated) {
       getCount();
     }
   }, [keycloak.authenticated]);
+
+  useEffect(() => {
+    if (keycloak.authenticated) {
+      getUsers({ page: page, size: size });
+    }
+  }, [count]);
+
+  useEffect(() => {
+    if (users !== undefined) {
+      getUsers({ page: page, size: size });
+    }
+  }, [page, size]);
 
   const baseRequest = {
     firstName: "",
@@ -48,16 +62,20 @@ const Users = () => {
     service.usersCount().then((response) => {
       if (response.status === 200) {
         setCount(response.data);
-        getUsers(page, rowsPerPage);
       }
       console.log(response);
     });
   };
 
-  const getUsers = (page, size) => {
-    service.getAllUsers({ page: page, size: size }).then((response) => {
+  const getUsers = (params) => {
+    service.getAllUsers(params).then((response) => {
       if (response.status === 200) {
-        setUsers(response.data);
+        setUsers({
+          content: response.data,
+          totalElements: count,
+          number: page,
+          size: size,
+        });
       }
       console.log(response);
     });
@@ -95,7 +113,7 @@ const Users = () => {
             position: "top-center",
             autoClose: 3000,
             onClose: () => {
-                getUsers(page,rowsPerPage)
+              getUsers();
             },
           });
           hideDialog();
@@ -107,7 +125,7 @@ const Users = () => {
             position: "top-center",
             autoClose: 3000,
           });
-        }else if (err.status === 409) {
+        } else if (err.status === 409) {
           toast.error(`Email Exists`, {
             position: "top-center",
             autoClose: 3000,
@@ -230,19 +248,30 @@ const Users = () => {
       setSelectedItems(selectedItems.filter((item) => item !== id));
     }
   };
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
+
+  const handleMultipleSelect = (e, targets) => {
+    if (e.target.checked) {
+      setSelectedItems((prev) => [...new Set([...prev, ...targets])]);
+    } else {
+      setSelectedItems((prev) => prev.filter((item) => !targets.includes(item)));
+    }
+    console.log(selectedItems);
   };
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+
+  const handlePageChange = (page) => {
+    setSelectedItems([]);
+    setPage(page);
+  };
+
+  const handleOnRowsPerPageChange = (size) => {
+    setSize(size);
   };
 
   const header = () => {
     return (
       <div className="flex items-center justify-between space-x-4 py-4">
         <button
-          className="rounded-lg bg-green-500 px-4 py-2 font-bold text-white hover:bg-green-600"
+          className="rounded-xl bg-green-500 px-5 py-3 text-base font-bold text-white transition duration-200 hover:bg-green-600 active:bg-green-700 dark:bg-green-400 dark:text-white dark:hover:bg-green-300 dark:active:bg-green-200"
           onClick={() => {
             handleCreate();
           }}
@@ -251,11 +280,11 @@ const Users = () => {
         </button>
 
         <button
-          className={`rounded-lg px-4 py-2 font-bold text-white 
+          className={`rounded-xl px-5 py-3 text-base font-bold text-white transition duration-200 dark:text-white dark:hover:bg-red-300 dark:active:bg-red-200 
                     ${
                       selectedItems.length === 0
                         ? "cursor-not-allowed bg-red-300"
-                        : "bg-red-500 hover:bg-red-600"
+                        : "bg-red-500 hover:bg-red-600 active:bg-red-700 dark:bg-red-400"
                     }`}
           onClick={() => {}}
         >
@@ -308,19 +337,16 @@ const Users = () => {
         submitted={submitted}
         handleSubmitFormik={handleSubmitFormik}
       />
-      <CheckTable
-        header={header()}
+      <DefaultTable
+        header={header}
         columnsData={usersColumnsData}
         tableData={users}
-        count={count}
-        page={page}
-        rowsPerPage={rowsPerPage}
-        setPage={(newPage) => setPage(newPage)}
-        onPageChange={(e, newPage) => handleChangePage(e, newPage)}
-        handleChangeRowsPerPage={handleChangeRowsPerPage}
         actionButtons={actionButtons}
         selectedItems={selectedItems}
         handleSelect={(e, id) => handleSelect(e, id)}
+        handleMultipleSelect={handleMultipleSelect}
+        handlePageChange={handlePageChange}
+        handleOnRowsPerPageChange={handleOnRowsPerPageChange}
       />
     </div>
   );

@@ -4,14 +4,14 @@ import Navbar from "components/navbar";
 import Sidebar from "components/sidebar";
 import Footer from "components/footer/Footer";
 import routes from "routes.js";
-import {useKeycloak} from "@react-keycloak/web";
+import { useKeycloak } from "@react-keycloak/web";
 
 export default function Admin(props) {
   const { ...rest } = props;
   const location = useLocation();
   const [open, setOpen] = React.useState(true);
   const [currentRoute, setCurrentRoute] = React.useState("Main Dashboard");
-  const {keycloak,initialized} = useKeycloak();
+  const { keycloak, initialized } = useKeycloak();
 
   React.useEffect(() => {
     window.addEventListener("resize", () =>
@@ -19,51 +19,57 @@ export default function Admin(props) {
     );
   }, []);
   React.useEffect(() => {
-    getActiveRoute(routes);
+    setCurrentRoute(getActiveRoute(routes));
   }, [location.pathname]);
-
   React.useEffect(() => {
     if (initialized) {
       if (!keycloak.authenticated) {
-        keycloak.login();
+        keycloak.login({locale:"tr"});
       }
     }
-  },[initialized]);
-
+  }, [initialized]);
   React.useEffect(() => {
     const intervalId = setInterval(() => {
       if (keycloak.authenticated) {
-        keycloak.updateToken(300)
-            .then((refreshed) => {
-              if (refreshed) {
-                console.log('Token successfully refreshed');
-              } else {
-                console.log('Token is still valid');
-              }
-            })
-            .catch(() => {
-              console.error('Failed to refresh token');
-              keycloak.login();
-            });
+        keycloak
+          .updateToken(300)
+          .then((refreshed) => {
+            if (refreshed) {
+              console.log("Token successfully refreshed");
+            } else {
+              console.log("Token is still valid");
+            }
+          })
+          .catch(() => {
+            console.error("Failed to refresh token");
+            keycloak.login({locale:"tr"});
+          });
       }
     }, 4 * 60 * 1000);
-
     return () => clearInterval(intervalId);
   }, [keycloak.authenticated]);
 
+  const matchPath = (routePath, currentPath) => {
+    const regexPattern = new RegExp("^" + routePath.replace(/:[^/]+/g, "([^/]+)") + "$");
+    return regexPattern.test(currentPath);
+  };
+
   const getActiveRoute = (routes) => {
-    let activeRoute = "Main Dashboard";
     for (let i = 0; i < routes.length; i++) {
-      if (
-        window.location.href.indexOf(
-          routes[i].layout + "/" + routes[i].path
-        ) !== -1
-      ) {
-        setCurrentRoute(routes[i].name);
+      const fullPath = `${routes[i].layout}/${routes[i].path}`.replace(/\/+/g, '/'); // Gereksiz '/' temizlendi
+
+      if (matchPath(fullPath, window.location.pathname)) {
+        return routes[i].name;
+      }
+
+      if (routes[i].childRoutes) {
+        const childRoute = getActiveRoute(routes[i].childRoutes);
+        if (childRoute) return childRoute;
       }
     }
-    return activeRoute;
+    return null;
   };
+
   const getActiveNavbar = (routes) => {
     let activeNavbar = false;
     for (let i = 0; i < routes.length; i++) {
@@ -76,10 +82,17 @@ export default function Admin(props) {
     return activeNavbar;
   };
   const getRoutes = (routes) => {
-    return routes.map((prop, key) => {
-      if (prop.layout === "/admin") {
+    return routes.map((route, key) => {
+      if (route.layout === "/admin") {
         return (
-          <Route path={`/${prop.path}`} element={prop.component} key={key} />
+          <>
+            <Route
+              key={key}
+              path={`/${route.path}`}
+              element={route.component}
+            />
+            {route.childRoutes && getRoutes(route.childRoutes)}
+          </>
         );
       } else {
         return null;
@@ -88,6 +101,7 @@ export default function Admin(props) {
   };
 
   document.documentElement.dir = "ltr";
+
   return (
     <div className="flex h-full w-full">
       <Sidebar open={open} onClose={() => setOpen(false)} />
@@ -110,7 +124,11 @@ export default function Admin(props) {
             <div className="pt-5s mx-auto mb-auto h-full min-h-[84vh] p-2 md:pr-2">
               <Routes>
                 {getRoutes(routes)}
-                <Route path="/" element={<Navigate to="/admin/default" replace />} />
+                <Route
+                  path="/"
+                  element={<Navigate to="/admin/default" replace />}
+                />
+                <Route path="*" element={<div>404 NOT FOUND</div>} />
               </Routes>
             </div>
             <div className="p-3">

@@ -7,12 +7,12 @@ const api = axios.create({
     },
 });
 
-const createRequest = async (uri, method , data, params,token) => {
+const createRequest = async (uri, method , data, params,keycloak) => {
     const config = {
         method,
         url: uri,
         headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${keycloak.token}`,
         },
     };
 
@@ -26,10 +26,11 @@ const createRequest = async (uri, method , data, params,token) => {
     try {
         return await api(config);
     } catch (error) {
-        if (error.status !== 503) {
-            throw error;
+        if (error.status === 401) {
+            keycloak.login();
         }
         console.error(error);
+        throw error;
     }
 };
 

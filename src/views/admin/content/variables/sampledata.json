@@ -1,0 +1,40 @@
+[
+  {
+    "id": "d0c15b37-4b1c-440c-b2a6-6be1387a7a8c",
+    "name": "Unnamed Memory 2. Sezon",
+    "description": "Unnamed Memory adlı anime 2. sezonu",
+    "photoUrl": "https://blog.aprilisfansub.com/wp-content/uploads/2024/06/unnamed-memory-2.-sezon-724x1024.webp",
+    "type": "MOVIE",
+    "subject": "Tinasha Sama...",
+    "startDate": "2024-02-28",
+    "slug": "unnamed-memory-sezon-2",
+    "mediaList": [
+      {
+        "name": "Unnamed Memory 2. Sezon 1. Bölüm",
+        "description": "unnamed memory 2.sezon 1.bölüm,unnamed memory 2.sezon 1.bölüm,unnamed memory 2.sezon 1.bölüm,unnamed memory 2.sezon 1.bölüm,unnamed memory 2.sezon 1.bölüm",
+        "count": 1,
+        "mediaSourceList": [
+          {
+            "url": "www.link.com",
+            "type": "GOOGLE_DRIVE",
+            "mediaId": "506a9c3d-8ea6-4982-989c-d955625ddff2",
+            "fanSub": "seicode"
+          }
+        ],
+        "publishDate": "2024-02-28",
+        "slug": "unnamed-memory-sezon-2-bölüm-1"
+      }
+    ]
+  },
+  {
+    "id": "427c2625-4f8e-41f2-b8e3-35ef65631af6",
+    "name": "Unnamed Memory",
+    "description": "Unnamed Memory",
+    "photoUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSh1JjZAGKgezmVBQzcrYnoQ-SVMzM3kAqqwQ&s",
+    "type": "SERIES",
+    "subject": "lorem epsum",
+    "startDate": "2024-02-28",
+    "slug": "unnamed-memory-sezon-1",
+    "mediaList": []
+  }
+]

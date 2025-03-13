@@ -8,7 +8,7 @@ import routes from "routes.js";
 const Sidebar = ({ open, onClose }) => {
 
   const filterRoutes = (routes) => {
-    return routes.filter((route) => route.layout === "/admin");
+    return routes.filter((route) => route.layout !== "/rtl");
   };
 
   return (
