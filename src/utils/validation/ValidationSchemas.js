@@ -45,7 +45,7 @@ export const ContentCreateValidationSchema = Yup.object({
   startDate: Yup.string().required("StartDate is Required").typeError("Type Error"),
   type : Yup.string().required("Bu Alan Boş Bırakılamaz").oneOf(typeOptions.map(option => option.value),"Option Error"),
   episodeTime : Yup.number().required("Bu Alan Boş Bırakılamaz"),
-  categoryIds : Yup.array().min(1,"Minimum 1 Item")
+  categories : Yup.array().min(1,"Minimum 1 Item")
 });
 
 export const ContentUpdateValidationSchema = Yup.object({
@@ -55,14 +55,12 @@ export const ContentUpdateValidationSchema = Yup.object({
   startDate: Yup.string().required("StartDate is Required").typeError("Type Error"),
   type : Yup.string().required("Bu Alan Boş Bırakılamaz").oneOf(typeOptions.map(option => option.value),"Option Error"),
   episodeTime : Yup.number().required("Bu Alan Boş Bırakılamaz"),
-  categoryIds : Yup.array().min(1,"Minimum 1 Item")
+  categories : Yup.array().min(1,"Minimum 1 Item")
 });
 
 export const MediaValidationSchema = Yup.object({
-  name: Yup.string().required("Name is required"),
   description: Yup.string().required("Description is required"),
   count: Yup.number().required("Count is required"),
-  slug: Yup.string().required("Slug is Required"),
   publishDate: Yup.string().required("Publish Date is Required").typeError("Type Error"),
 });
 

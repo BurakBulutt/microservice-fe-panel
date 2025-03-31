@@ -254,8 +254,8 @@ const ContentMeta = (props) => {
                 buttonText="Kategoriler"
                 component={<Category header={categoryView} actionButtons={actionButtons}/>}
             />
-            {formik.errors?.categoryIds && (
-                <div className="ml-2 mt-2 text-red-500">{formik.errors?.categoryIds}</div>
+            {formik.errors.categories && (
+                <div className="ml-2 mt-2 text-red-500">{formik.errors.categories}</div>
             )}
           </div>
           <div className="flex-1">

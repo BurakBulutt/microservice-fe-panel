@@ -69,7 +69,7 @@ const MediaList = (props) => {
     service
       .create(request)
       .then((response) => {
-        if (response.status === 200) {
+        if (response.status === 201) {
           toast.success("Create Success", {
             position: "top-center",
             autoClose: 3000,
@@ -92,7 +92,7 @@ const MediaList = (props) => {
     service
       .update(request.id, request)
       .then((response) => {
-        if (response.status === 200) {
+        if (response.status === 204) {
           toast.success("Update Success", {
             position: "top-center",
             autoClose: 3000,
@@ -115,7 +115,7 @@ const MediaList = (props) => {
     service
       .delete(id)
       .then((response) => {
-        if (response.status === 200) {
+        if (response.status === 204) {
           toast.success("Delete Success", {
             position: "top-center",
             autoClose: 3000,

@@ -1,6 +1,6 @@
 import createRequest from "./ApiService";
 
-const defaultUrl = "api/v1/users";
+const defaultUrl = "users";
 
 export class UserService {
   keycloak;
@@ -63,16 +63,6 @@ export class UserService {
     return await createRequest(
         defaultUrl + `/${id}/reset-password`,
         "POST",
-        null,
-        null,
-        this.keycloak
-    );
-  }
-
-  async usersCount() {
-    return await createRequest(
-        defaultUrl + "/count",
-        "GET",
         null,
         null,
         this.keycloak

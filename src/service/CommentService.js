@@ -1,6 +1,6 @@
 import createRequest from "./ApiService";
 
-const defaultUrl = "api/v1/comments";
+const defaultUrl = "comments";
 
 export class CommentService {
     keycloak;

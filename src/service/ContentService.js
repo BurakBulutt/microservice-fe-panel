@@ -1,6 +1,6 @@
 import createRequest from "./ApiService";
 
-const defaultUrl = "api/v1/contents";
+const defaultUrl = "contents";
 
 export class ContentService {
     keycloak;

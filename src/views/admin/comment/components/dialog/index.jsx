@@ -22,8 +22,6 @@ const CommentDialog = (props) => {
 
 
     const handleEvent =(e) => {
-        console.log(data);
-        console.log(e.target.value);
         setField(e.target.value);
     }
 

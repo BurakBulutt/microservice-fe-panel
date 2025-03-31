@@ -88,7 +88,10 @@ const CategoryDialog = (props) => {
                             <button
                                 type="button"
                                 className="cursor-pointer rounded-md bg-green-500 px-4 py-2 font-bold text-white"
-                                onClick={formik.handleSubmit}
+                                onClick={() => {
+                                    formik.handleSubmit();
+                                    onClose();
+                                }}
                             >
                                 {"Kaydet"}
                             </button>

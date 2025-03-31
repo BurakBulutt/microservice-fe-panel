@@ -5,16 +5,6 @@ import InputField from "../../../../../components/fields/InputField";
 const MediaDialog = (props) => {
     const {formik,dialogVisible,hideDialog,submitted,handleSubmitFormik} = props;
 
-    const createSlug = (name) => {
-        const slug = name
-            .toLowerCase()
-            .trim()
-            .replace(/[^\w\s-]/g, '')
-            .replace(/[\s_-]+/g, '-')
-            .replace(/^-+|-+$/g, '');
-        formik.setFieldValue("slug",slug);
-    };
-
     return (
         <Dialog
             open={dialogVisible}
@@ -29,23 +19,6 @@ const MediaDialog = (props) => {
                     >
                         {formik.values?.id ? "Medya Düzenle" : "Medya Oluştur"}
                     </Dialog.Title>
-                    <div className="mb-4">
-                        <InputField
-                            label="Name"
-                            placeholder="name"
-                            name="name"
-                            type="text"
-                            state={formik.errors?.name && submitted && "error"}
-                            value={formik.values?.name}
-                            onChange={(e) => {
-                                formik.handleChange(e);
-                                createSlug(e.target.value);
-                            }}
-                        />
-                        {formik.errors.name && submitted &&(
-                            <div className="ml-2 mt-2 text-red-500">{formik.errors.name}</div>
-                        )}
-                    </div>
                     <div className="mb-4">
                         <InputField
                             label="Description"
@@ -90,20 +63,6 @@ const MediaDialog = (props) => {
                         />
                         {formik.errors.publishDate && submitted &&(
                             <div className="ml-2 mt-2 text-red-500">{formik.errors.publishDate}</div>
-                        )}
-                    </div>
-                    <div className="mb-4">
-                        <InputField
-                            disabled={true}
-                            label="Slug"
-                            placeholder="Slug"
-                            name="slug"
-                            type="text"
-                            state={formik.errors.slug && submitted && "error"}
-                            value={formik.values.slug}
-                        />
-                        {formik.errors.slug && submitted &&(
-                            <div className="ml-2 mt-2 text-red-500">{formik.errors.slug}</div>
                         )}
                     </div>
                     <div className="flex justify-end">

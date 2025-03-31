@@ -62,7 +62,7 @@ const Category = (props) => {
     }
     const createItem = (request) => {
         service.create(request).then((response) => {
-            if (response.status === 200) {
+            if (response.status === 201) {
                 toast.success("Create Success", {
                     position: "top-center",
                     autoClose: 3000,
@@ -76,7 +76,7 @@ const Category = (props) => {
     }
     const updateItem = (id,request) => {
         service.update(id,request).then((response) => {
-            if (response.status === 200) {
+            if (response.status === 204) {
                 toast.success("Update Success", {
                     position: "top-center",
                     autoClose: 3000,
@@ -90,7 +90,7 @@ const Category = (props) => {
     }
     const deleteItem = (id) => {
         service.delete(id).then((response) => {
-            if (response.status === 200) {
+            if (response.status === 204) {
                 toast.success("Delete Success", {
                     position: "top-center",
                     autoClose: 3000,

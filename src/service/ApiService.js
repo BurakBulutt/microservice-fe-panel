@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: 'http://localhost:8081',
+    baseURL: 'http://localhost:8080/api/',
     headers: {
         'Content-Type': 'application/json',
     },
@@ -26,9 +26,6 @@ const createRequest = async (uri, method , data, params,keycloak) => {
     try {
         return await api(config);
     } catch (error) {
-        if (error.status === 401) {
-            keycloak.login();
-        }
         console.error(error);
         throw error;
     }

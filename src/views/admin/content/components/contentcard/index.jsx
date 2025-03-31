@@ -27,7 +27,7 @@ const ContentCard = () => {
     subject : "",
     startDate : null,
     slug : "",
-    categoryIds : [],
+    categories : [],
     episodeTime : 0
   }
   const tabs = [
@@ -77,7 +77,7 @@ const ContentCard = () => {
 
   const update = (request) => {
     service.update(request.id,request).then(response => {
-      if (response.status === 200) {
+      if (response.status === 204) {
         toast.success("Update Success",{
           position : 'top-center',
           autoClose : 3000
@@ -88,7 +88,7 @@ const ContentCard = () => {
 
   const create = (request) => {
     service.create(request).then(response => {
-      if (response.status === 200) {
+      if (response.status === 201) {
         toast.success("Save Success",{
           position : 'top-center',
           autoClose : 3000,

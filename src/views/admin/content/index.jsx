@@ -45,7 +45,7 @@ const Content = (props) => {
   };
   const handleDelete = (id) => {
     service.delete(id).then((response) => {
-      if (response.status === 200) {
+      if (response.status === 204) {
         toast.success("Delete Success", {
           position: "top-center",
           autoClose: 3000,

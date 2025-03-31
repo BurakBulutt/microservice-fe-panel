@@ -3,8 +3,6 @@ import { Dialog } from "@headlessui/react";
 import { useKeycloak } from "@react-keycloak/web";
 import { MediaService } from "../../../../../service/MediaService";
 
-import video from "../../../../../assets/video/Awaken _ Season 2019 Cinematic - League of Legends (ft. Valerie Broussard).mp4";
-
 const PlayerDialog = (props) => {
   const { dialogVisible, hideDialog, data } = props;
   const { keycloak } = useKeycloak();
@@ -18,6 +16,7 @@ const PlayerDialog = (props) => {
   const [filteredMedia, setFilteredMedia] = useState(null);
 
   useEffect(() => {
+    setFilteredMedia(null);
     if (data && dialogVisible) {
       getMediaSources(data);
     }
@@ -46,6 +45,7 @@ const PlayerDialog = (props) => {
                 .map((item) => item.type)
             ),
           ];
+
           setTypeOptions(filteredTypes);
           setSelectedType(filteredTypes[0] || "");
         }
@@ -124,7 +124,7 @@ const PlayerDialog = (props) => {
               </select>
             </div>
           </div>
-          {filteredMedia && (
+          {filteredMedia?.url && (
             <div className="p-4">
               <p className="mb-2 text-sm text-gray-700">Seçilen Video</p>
               <iframe

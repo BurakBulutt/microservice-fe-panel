@@ -44,7 +44,7 @@ const Comment = (props) => {
 
   const handleUpdate = (id,data) => {
     service.update(id,{content:data}).then(response => {
-      if (response.status === 200) {
+      if (response.status === 204) {
         toast.success("Update Success",{
           position : 'top-center',
           autoClose : 3000
@@ -55,7 +55,7 @@ const Comment = (props) => {
 
   const handleDelete = (id) => {
     service.delete(id).then((response) => {
-      if (response.status === 200) {
+      if (response.status === 204) {
         toast.success("Delete Success", {
           position: "top-center",
           autoClose: 3000,

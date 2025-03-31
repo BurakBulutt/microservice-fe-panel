@@ -22,21 +22,14 @@ const Users = (props) => {
     UserCreateValidationSchema
   );
   const service = new UserService(keycloak);
-  const [count, setCount] = useState(0);
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(10);
 
   useEffect(() => {
     if (keycloak.authenticated) {
-      getCount();
-    }
-  }, [keycloak.authenticated]);
-
-  useEffect(() => {
-    if (keycloak.authenticated) {
       getUsers({ page: page, size: size });
     }
-  }, [count]);
+  }, [keycloak.authenticated]);
 
   useEffect(() => {
     if (users !== undefined) {
@@ -58,24 +51,10 @@ const Users = (props) => {
     birthdate: "",
   };
 
-  const getCount = () => {
-    service.usersCount().then((response) => {
-      if (response.status === 200) {
-        setCount(response.data);
-      }
-      console.log(response);
-    });
-  };
-
   const getUsers = (params) => {
     service.getAllUsers(params).then((response) => {
       if (response.status === 200) {
-        setUsers({
-          content: response.data,
-          totalElements: count,
-          number: page,
-          size: size,
-        });
+        setUsers(response.data);
       }
       console.log(response);
     });
@@ -89,14 +68,14 @@ const Users = (props) => {
           toast.success("Create Success", {
             position: "top-center",
             autoClose: 3000,
-            onClose: getCount,
+            onClose: getUsers,
           });
           hideDialog();
         }
       })
       .catch((error) => {
         if (error.status === 409) {
-          toast.error(`User Exists : ${request.username}`, {
+          toast.error(`Username or Email Already Taken`, {
             position: "top-center",
             autoClose: 3000,
           });
@@ -108,7 +87,7 @@ const Users = (props) => {
     service
       .updateUser(request.id, request)
       .then((response) => {
-        if (response.status === 200) {
+        if (response.status === 204) {
           toast.success("Update Success", {
             position: "top-center",
             autoClose: 3000,
@@ -126,7 +105,7 @@ const Users = (props) => {
             autoClose: 3000,
           });
         } else if (err.status === 409) {
-          toast.error(`Email Exists`, {
+          toast.error(`Email Already Taken`, {
             position: "top-center",
             autoClose: 3000,
           });
@@ -142,7 +121,7 @@ const Users = (props) => {
           toast.success("Delete Success", {
             position: "top-center",
             autoClose: 3000,
-            onClose: getCount,
+            onClose: getUsers,
           });
         }
       })
@@ -160,11 +139,11 @@ const Users = (props) => {
     service
       .verifyEmail(id)
       .then((response) => {
-        if (response.status === 200) {
+        if (response.status === 204) {
           toast.success("Delete Success", {
             position: "top-center",
             autoClose: 3000,
-            onClose: getCount,
+            onClose: getUsers,
           });
         }
       })
@@ -187,11 +166,11 @@ const Users = (props) => {
     service
       .resetUserPassword(id)
       .then((response) => {
-        if (response.status === 200) {
+        if (response.status === 204) {
           toast.success("Delete Success", {
             position: "top-center",
             autoClose: 3000,
-            onClose: getCount,
+            onClose: getUsers,
           });
         }
       })

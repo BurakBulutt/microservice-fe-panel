@@ -226,11 +226,11 @@ function DefaultTable(props) {
       </div>
       <TablePagination
         component="div"
-        count={tableData?.totalElements}
-        page={tableData?.number}
+        count={tableData?.page?.totalElements}
+        page={tableData?.page?.number}
         onPageChange={(e, page) => props.handlePageChange(page)}
-        rowsPerPage={tableData?.size}
-        rowsPerPageOptions={rowsPerPage(tableData?.totalElements)}
+        rowsPerPage={tableData?.page?.size}
+        rowsPerPageOptions={rowsPerPage(tableData?.page?.totalElements)}
         onRowsPerPageChange={(e) =>
           props.handleOnRowsPerPageChange(parseInt(e.target.value, 10))
         }

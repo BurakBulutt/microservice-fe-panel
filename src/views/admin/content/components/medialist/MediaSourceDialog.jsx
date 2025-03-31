@@ -36,7 +36,7 @@ const MediaSourceDialog = (props) => {
     service
         .updateMediaSources(data,request)
         .then((response) => {
-          if (response.status === 200) {
+          if (response.status === 204) {
             toast.success("UPDATE SUCCESS",{
               position : 'top-center',
               autoClose : 3000,
