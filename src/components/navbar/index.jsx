@@ -22,7 +22,6 @@ const Navbar = (props) => {
       keycloak
         .loadUserProfile()
         .then((profile) => {
-          console.log(profile);
           setUserProfile(profile);
         })
         .catch((err) => console.log(err));
@@ -68,7 +67,7 @@ const Navbar = (props) => {
           <input
             type="text"
             placeholder="Search..."
-            class="block h-full w-full rounded-full bg-lightPrimary text-sm font-medium text-navy-700 outline-none placeholder:!text-gray-400 dark:bg-navy-900 dark:text-white dark:placeholder:!text-white sm:w-fit"
+            className="block h-full w-full rounded-full bg-lightPrimary text-sm font-medium text-navy-700 outline-none placeholder:!text-gray-400 dark:bg-navy-900 dark:text-white dark:placeholder:!text-white sm:w-fit"
           />
         </div>
         <span

@@ -1,27 +1,22 @@
-import { mediaColumnsData } from "../../../../../components/table/columnsData"
+import { mediaColumnsData } from "../../../../../components/table/columnsData";
 import React, { useEffect, useState } from "react";
 import { FaEdit, FaEye, FaPlay, FaTrash } from "react-icons/fa";
 import { useFormik } from "formik";
 import { MediaValidationSchema } from "../../../../../utils/validation/ValidationSchemas";
 import { toast } from "react-toastify";
 import { MediaService } from "../../../../../service/MediaService";
-import { useKeycloak } from "@react-keycloak/web";
 import MediaDialog from "../mediadialog";
-import MediaSourceDialog from "./MediaSourceDialog";
+import MediaSourceDialog from "../mediasourcedialog";
 import Playerdialog from "../playerdialog";
 import DefaultTable from "../../../../../components/table/CheckTable";
 
-const MediaList = (props) => {
+const Media = (props) => {
   const { contentId } = props;
   const [items, setItems] = useState(undefined);
   const [selectedItems, setSelectedItems] = useState([]);
   const [dialogVisible, setDialogVisible] = useState(false);
-  const [sourceDialogVisible, setSourceDialogVisible] = useState(false);
-  const [playerDialogVisible, setPlayerDialogVisible] = useState(false);
-  const [mediaId, setMediaId] = useState(undefined);
   const [submitted, setSubmitted] = useState(false);
-  const { keycloak } = useKeycloak();
-  const service = new MediaService(keycloak);
+  const service = new MediaService();
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(10);
 
@@ -30,21 +25,10 @@ const MediaList = (props) => {
     description: "",
     count: undefined,
     publishDate: undefined,
-    contentId: contentId,
+    contentId: "",
     slug: "",
     mediaSourceList: [],
   };
-
-  useEffect(() => {
-    getItems({ page: page, size: size });
-  }, []);
-
-  useEffect(() => {
-    if (items !== undefined) {
-      getItems({ page: page, size: size });
-    }
-  }, [page, size]);
-
   const formik = useFormik({
     initialValues: baseItem,
     validationSchema: MediaValidationSchema,
@@ -56,6 +40,10 @@ const MediaList = (props) => {
       }
     },
   });
+
+  useEffect(() => {
+    getItems({ page: page, size: size });
+  }, [page, size]);
 
   const getItems = (params) => {
     service.getByContentId(params, contentId).then((response) => {
@@ -142,6 +130,7 @@ const MediaList = (props) => {
   };
   const handleCreate = () => {
     formik.setValues(baseItem);
+    formik.setFieldValue("contentId", contentId);
     setDialogVisible(true);
   };
   const handleUpdate = (data) => {
@@ -226,26 +215,8 @@ const MediaList = (props) => {
         >
           <FaTrash size={24} />
         </button>
-        <button
-          className="flex cursor-pointer items-center justify-center rounded-lg bg-lime-400 p-2 text-white hover:bg-lime-500"
-          onClick={() => {
-            setMediaId(data.id);
-            setPlayerDialogVisible(true);
-          }}
-          aria-label="Oynat"
-        >
-          <FaPlay size={24} />
-        </button>
-        <button
-          className="flex cursor-pointer items-center justify-center rounded-lg bg-gray-300 p-2 text-white hover:bg-gray-400"
-          onClick={() => {
-            setMediaId(data.id);
-            setSourceDialogVisible(true);
-          }}
-          aria-label="Kaynak"
-        >
-          <FaEye size={24} />
-        </button>
+        <MediaSourceDialog data={data.id} />
+        <Playerdialog data={data.id} />
       </div>
     );
   };
@@ -257,20 +228,6 @@ const MediaList = (props) => {
         hideDialog={hideDialog}
         submitted={submitted}
         handleSubmitFormik={handleSubmitFormik}
-      />
-      <MediaSourceDialog
-        dialogVisible={sourceDialogVisible}
-        hideDialog={() => {
-          setSourceDialogVisible(false);
-        }}
-        data={mediaId}
-      />
-      <Playerdialog
-        dialogVisible={playerDialogVisible}
-        hideDialog={() => {
-          setPlayerDialogVisible(false);
-        }}
-        data={mediaId}
       />
       <DefaultTable
         header={header}
@@ -286,4 +243,4 @@ const MediaList = (props) => {
     </>
   );
 };
-export default MediaList;
+export default Media;

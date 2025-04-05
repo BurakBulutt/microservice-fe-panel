@@ -3,19 +3,13 @@ import createRequest from "./ApiService";
 const defaultUrl = "categories";
 
 export class CategoryService {
-    keycloak;
-
-    constructor(keycloak) {
-        this.keycloak = keycloak;
-    }
 
     async getAll(params) {
         return await createRequest(
             defaultUrl,
             "GET",
             null,
-            params,
-            this.keycloak
+            params
         );
     }
 
@@ -24,8 +18,7 @@ export class CategoryService {
             defaultUrl,
             "POST",
             request,
-            null,
-            this.keycloak
+            null
         );
     }
 
@@ -34,8 +27,7 @@ export class CategoryService {
             defaultUrl + `/${id}`,
             "PUT",
             request,
-            null,
-            this.keycloak
+            null
         );
     }
 
@@ -44,8 +36,7 @@ export class CategoryService {
             defaultUrl + `/${id}`,
             "DELETE",
             null,
-            null,
-            this.keycloak
+            null
         );
     }
 }

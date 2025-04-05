@@ -2,7 +2,6 @@ import { usersColumnsData } from "../../../components/table/columnsData";
 import { FaEdit, FaMailBulk, FaTrash, FaUserLock } from "react-icons/fa";
 import React, { useEffect, useState } from "react";
 import { UserService } from "../../../service/UserService";
-import { useKeycloak } from "@react-keycloak/web";
 import UserDialog from "./components/UserDialog";
 import { useFormik } from "formik";
 import { toast } from "react-toastify";
@@ -13,7 +12,6 @@ import {
 import DefaultTable from "../../../components/table/CheckTable";
 
 const Users = (props) => {
-  const { keycloak } = useKeycloak();
   const [users, setUsers] = useState(undefined);
   const [selectedItems, setSelectedItems] = useState([]);
   const [dialogVisible, setDialogVisible] = useState(false);
@@ -21,20 +19,12 @@ const Users = (props) => {
   const [validationSchema, setValidationSchema] = useState(
     UserCreateValidationSchema
   );
-  const service = new UserService(keycloak);
+  const service = new UserService();
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(10);
 
   useEffect(() => {
-    if (keycloak.authenticated) {
-      getUsers({ page: page, size: size });
-    }
-  }, [keycloak.authenticated]);
-
-  useEffect(() => {
-    if (users !== undefined) {
-      getUsers({ page: page, size: size });
-    }
+    getUsers({ page: page, size: size });
   }, [page, size]);
 
   const baseRequest = {
@@ -232,7 +222,9 @@ const Users = (props) => {
     if (e.target.checked) {
       setSelectedItems((prev) => [...new Set([...prev, ...targets])]);
     } else {
-      setSelectedItems((prev) => prev.filter((item) => !targets.includes(item)));
+      setSelectedItems((prev) =>
+        prev.filter((item) => !targets.includes(item))
+      );
     }
     console.log(selectedItems);
   };

@@ -5,20 +5,20 @@ import RtlLayout from "layouts/rtl";
 import AdminLayout from "layouts/admin";
 import AuthLayout from "layouts/auth";
 import {ReactKeycloakProvider} from "@react-keycloak/web";
-import {keycloakConfig} from "./utils/keycloak/keycloakconfig";
+import {keycloak} from "./utils/keycloak/keycloakConfig";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const App = () => {
   const initOptions = {
     onLoad: "check-sso",
-    pkceMethod: "S256",
+    enableTokenRefresh: true,
     checkLoginIframe: true,
-    silentCheckSsoRedirectUri: window.location.origin + "/silent-check-sso.html",
+    silentCheckSsoRedirectUri: `${window.location.origin}/silent-check-sso.html`
   };
 
   return (
-    <ReactKeycloakProvider authClient={keycloakConfig} initOptions={initOptions}>
+    <ReactKeycloakProvider authClient={keycloak} initOptions={initOptions}>
       <Routes>
         <Route path="auth/*" element={<AuthLayout />} />
         <Route path="admin/*" element={<AdminLayout />} />

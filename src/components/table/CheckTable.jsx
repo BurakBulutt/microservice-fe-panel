@@ -12,7 +12,7 @@ import {
 import Lightbox from "react-image-lightbox";
 import "react-image-lightbox/style.css";
 import { TablePagination } from "@mui/material";
-import CustomModal from "../../views/admin/comment/components/modal";
+import CustomModal from "../../components/modal/index";
 
 function DefaultTable(props) {
   const { tableData, columnsData } = props;

@@ -3,7 +3,7 @@ import React from "react";
 import InputField from "../../../../../components/fields/InputField";
 
 const CategoryDialog = (props) => {
-    const {isOpen,onClose,formik} = props;
+    const {formik,submitted,dialogVisible,handleSubmitFormik,hideDialog} = props;
 
     const createSlug = (name) => {
         const slug = name
@@ -18,8 +18,8 @@ const CategoryDialog = (props) => {
     return (
         <div>
             <Dialog
-                open={isOpen}
-                onClose={onClose}
+                open={dialogVisible}
+                onClose={hideDialog}
                 className="fixed inset-0 z-10 overflow-y-auto"
             >
                 <div className="flex min-h-screen items-center justify-center">
@@ -43,7 +43,7 @@ const CategoryDialog = (props) => {
                                     createSlug(e.target.value);
                                 }}
                             />
-                            {formik.errors.name && (
+                            {formik.errors.name && submitted (
                                 <div className="ml-2 mt-2 text-red-500">{formik.errors.name}</div>
                             )}
                         </div>
@@ -59,7 +59,7 @@ const CategoryDialog = (props) => {
                                     formik.handleChange(e);
                                 }}
                             />
-                            {formik.errors.description && (
+                            {formik.errors.description && submitted(
                                 <div className="ml-2 mt-2 text-red-500">{formik.errors.description}</div>
                             )}
                         </div>
@@ -73,14 +73,14 @@ const CategoryDialog = (props) => {
                                 state={formik.errors.slug && "error"}
                                 value={formik.values.slug}
                             />
-                            {formik.errors.slug && (
+                            {formik.errors.slug && submitted(
                                 <div className="ml-2 mt-2 text-red-500">{formik.errors.slug}</div>
                             )}
                         </div>
                         <div className="flex justify-end">
                             <button
                                 type="button"
-                                onClick={onClose}
+                                onClick={hideDialog}
                                 className="mr-2 cursor-pointer rounded-md bg-red-500 px-4 py-2 font-bold text-white"
                             >
                                 İptal
@@ -88,10 +88,7 @@ const CategoryDialog = (props) => {
                             <button
                                 type="button"
                                 className="cursor-pointer rounded-md bg-green-500 px-4 py-2 font-bold text-white"
-                                onClick={() => {
-                                    formik.handleSubmit();
-                                    onClose();
-                                }}
+                                onClick={handleSubmitFormik}
                             >
                                 {"Kaydet"}
                             </button>

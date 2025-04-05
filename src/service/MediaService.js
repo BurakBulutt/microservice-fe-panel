@@ -3,19 +3,13 @@ import createRequest from "./ApiService";
 const defaultUrl = "medias";
 
 export class MediaService {
-    keycloak;
-
-    constructor(keycloak) {
-        this.keycloak = keycloak;
-    }
 
     async getAll(params) {
         return await createRequest(
             defaultUrl,
             "GET",
             null,
-            params,
-            this.keycloak
+            params
         );
     }
 
@@ -24,8 +18,7 @@ export class MediaService {
             defaultUrl + `/content/${id}`,
             "GET",
             null,
-            params,
-            this.keycloak
+            params
         );
     }
 
@@ -34,8 +27,7 @@ export class MediaService {
             defaultUrl + `/media-sources/${id}`,
             "GET",
             null,
-            null,
-            this.keycloak
+            null
         );
     }
 
@@ -44,8 +36,7 @@ export class MediaService {
             defaultUrl,
             "POST",
             request,
-            null,
-            this.keycloak
+            null
         );
     }
 
@@ -64,8 +55,7 @@ export class MediaService {
             defaultUrl + `/media-sources/${id}`,
             "PUT",
             request,
-            null,
-            this.keycloak
+            null
         );
     }
 
@@ -74,8 +64,7 @@ export class MediaService {
             defaultUrl + `/${id}`,
             "DELETE",
             null,
-            null,
-            this.keycloak
+            null
         );
     }
 }

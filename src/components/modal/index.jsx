@@ -1,6 +1,7 @@
 import { Modal, ModalOverlay, ModalContent, ModalBody } from "@chakra-ui/modal";
 import { useDisclosure } from "@chakra-ui/hooks";
-import Card from "../../../../../components/card";
+import Card from "../card";
+
 
 const CustomModal = (props) => {
   const { isOpen, onOpen, onClose } = useDisclosure();

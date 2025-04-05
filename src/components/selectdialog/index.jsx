@@ -4,18 +4,23 @@ import {Dialog} from "@headlessui/react";
 import {useDisclosure} from "@chakra-ui/hooks";
 
 const SelectDialog=(props) => {
+    const {extra,buttonText,component} = props;
     const {isOpen,onOpen,onClose} = useDisclosure();
 
     return (
       <div>
         <button
-            className="w-full rounded-xl bg-gradient-to-br from-[#EA52F8] to-[#0066FF] px-5 py-3 text-base font-medium text-white transition duration-200 hover:shadow-lg hover:shadow-[#0066FF]/25"          onClick={onOpen}
+            className={extra}
+            onClick={onOpen}
         >
-          {props.buttonText}
+          {buttonText}
         </button>
         <Dialog
           open={isOpen}
-          onClose={onClose}
+          onClose={(e) => {
+              props.onClose(e);
+              onClose(e);
+          }}
           className="fixed inset-0 z-10 overflow-y-auto"
         >
           <div className="flex min-h-screen items-center justify-center">
@@ -26,13 +31,15 @@ const SelectDialog=(props) => {
               >
                 {" "}
               </Dialog.Title>
-              {props.component}
+              {component}
               <div className="mt-4 flex justify-end">
                   <button
                       type="button"
                       className="linear flex flex-row items-center rounded-xl bg-green-500 px-5 py-3 text-base font-medium text-white transition duration-200 hover:bg-green-600 active:bg-green-700 dark:bg-green-400 dark:text-white dark:hover:bg-green-300 dark:active:bg-green-200"
-                      data-ripple-light
-                      onClick={onClose}
+                      onClick={(e) => {
+                          props.onSave(e);
+                          onClose();
+                      }}
                   >
                       <svg
                           className="mr-2 fill-white"

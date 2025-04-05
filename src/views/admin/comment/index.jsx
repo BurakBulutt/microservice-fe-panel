@@ -1,10 +1,9 @@
 import DefaultTable from "../../../components/table/CheckTable";
 import React, { useEffect, useState } from "react";
 import { commentColumnsData } from "../../../components/table/columnsData";
-import { useKeycloak } from "@react-keycloak/web";
 import { CommentService } from "../../../service/CommentService";
-import { FaEdit, FaTrash } from "react-icons/fa";
-import {toast} from "react-toastify";
+import { FaTrash } from "react-icons/fa";
+import { toast } from "react-toastify";
 import UserBanner from "./components/user";
 import Reply from "./components/reply";
 import CommentDialog from "./components/dialog";
@@ -12,45 +11,36 @@ import CommentDialog from "./components/dialog";
 const Comment = (props) => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [items, setItems] = useState(undefined);
-  const { keycloak } = useKeycloak();
-  const service = new CommentService(keycloak);
+  const service = new CommentService();
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(10);
 
   useEffect(() => {
-    if (keycloak.authenticated) {
-      getItems({ page: page, size: size });
-    }
-  }, [keycloak.authenticated]);
-
-  useEffect(() => {
-    if (items !== undefined) {
-      getItems({ page: page, size: size });
-    }
+    getItems({ page: page, size: size });
   }, [page, size]);
 
   const getItems = (params) => {
-    service.getAll(params).then(response => {
+    service.getAll(params).then((response) => {
       if (response.status === 200) {
         setItems(response.data);
-      }else {
+      } else {
         toast.error("Something went wrong", {
-          position:'top-center',
-          autoClose : 3000
-        })
+          position: "top-center",
+          autoClose: 3000,
+        });
       }
-    })
-  }
+    });
+  };
 
-  const handleUpdate = (id,data) => {
-    service.update(id,{content:data}).then(response => {
+  const handleUpdate = (id, data) => {
+    service.update(id, { content: data }).then((response) => {
       if (response.status === 204) {
-        toast.success("Update Success",{
-          position : 'top-center',
-          autoClose : 3000
-        })
+        toast.success("Update Success", {
+          position: "top-center",
+          autoClose: 3000,
+        });
       }
-    })
+    });
   };
 
   const handleDelete = (id) => {
@@ -62,7 +52,7 @@ const Comment = (props) => {
           onClose: getItems,
         });
       }
-    })
+    });
   };
 
   const handleSelect = (e, id) => {
@@ -84,12 +74,12 @@ const Comment = (props) => {
   };
 
   const handlePageChange = (page) => {
-    setSelectedItems([])
+    setSelectedItems([]);
     setPage(page);
   };
 
   const handleOnRowsPerPageChange = (size) => {
-    setSelectedItems([])
+    setSelectedItems([]);
     setSize(size);
   };
 
@@ -126,22 +116,25 @@ const Comment = (props) => {
       </div>
     );
   };
-  const modalComponent = (data,accessor) => {
+  const modalComponent = (data, accessor) => {
     switch (accessor) {
       case "content":
-        return <p className="text-navy-800 block font-sans text-xl font-normal leading-relaxed text-inherit antialiased dark:text-white">
-          {data}
-        </p>
+        return (
+          <p className="text-inherit block font-sans text-xl font-normal leading-relaxed text-navy-800 antialiased dark:text-white">
+            {data}
+          </p>
+        );
       case "user":
-        return <UserBanner data={data}/>
+        return <UserBanner data={data} />;
       case "parent":
-        return data && <Reply data={Array(data)}/>
+        return data && <Reply data={Array(data)} />;
       case "commentList":
-        return <Reply data={data}/>
+        return <Reply data={data} />;
       default:
-        return <></>
+        return <></>;
     }
-  }
+  };
+
   return (
     <DefaultTable
       header={header}

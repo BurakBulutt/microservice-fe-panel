@@ -4,7 +4,6 @@ import { FaEdit, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ContentService } from "../../../service/ContentService";
-import { useKeycloak } from "@react-keycloak/web";
 import DefaultTable from "../../../components/table/CheckTable";
 
 const Content = (props) => {
@@ -12,21 +11,12 @@ const Content = (props) => {
   const [contents, setContents] = useState(undefined);
   const location = useLocation();
   const navigate = useNavigate();
-  const { keycloak } = useKeycloak();
-  const service = new ContentService(keycloak);
+  const service = new ContentService();
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(10);
 
   useEffect(() => {
-    if (keycloak.authenticated) {
-      getContents({ page: page, size: size });
-    }
-  }, [keycloak.authenticated]);
-
-  useEffect(() => {
-    if (contents !== undefined) {
-      getContents({ page: page, size: size });
-    }
+    getContents({ page: page, size: size });
   }, [page, size]);
 
   const getContents = (params) => {

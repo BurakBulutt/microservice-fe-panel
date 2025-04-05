@@ -3,19 +3,13 @@ import createRequest from "./ApiService";
 const defaultUrl = "users";
 
 export class UserService {
-  keycloak;
-
-  constructor(keycloak) {
-    this.keycloak = keycloak;
-  }
 
   async getAllUsers(params) {
     return await createRequest(
       defaultUrl,
       "GET",
       null,
-      params,
-      this.keycloak
+      params
     );
   }
 
@@ -24,8 +18,7 @@ export class UserService {
         defaultUrl,
         "POST",
         request,
-        null,
-        this.keycloak
+        null
     );
   }
 
@@ -34,8 +27,7 @@ export class UserService {
         defaultUrl + `/${id}`,
         "PUT",
         request,
-        null,
-        this.keycloak
+        null
     );
   }
 
@@ -44,8 +36,7 @@ export class UserService {
         defaultUrl + `/${id}`,
         "DELETE",
         null,
-        null,
-        this.keycloak
+        null
     );
   }
 
@@ -54,8 +45,7 @@ export class UserService {
         defaultUrl + `/${id}/verify-email`,
         "POST",
         null,
-        null,
-        this.keycloak
+        null
     );
   }
 
@@ -64,8 +54,7 @@ export class UserService {
         defaultUrl + `/${id}/reset-password`,
         "POST",
         null,
-        null,
-        this.keycloak
+        null
     );
   }
 }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Navbar from "components/navbar";
 import Sidebar from "components/sidebar";
@@ -18,45 +18,30 @@ export default function Admin(props) {
       window.innerWidth < 1200 ? setOpen(false) : setOpen(true)
     );
   }, []);
+
   React.useEffect(() => {
     setCurrentRoute(getActiveRoute(routes));
   }, [location.pathname]);
+
   React.useEffect(() => {
-    if (initialized) {
-      if (!keycloak.authenticated) {
-        keycloak.login({locale:"tr"});
-      }
+    if (initialized && !keycloak.authenticated) {
+      keycloak.login({ locale: "tr" });
     }
-  }, [initialized]);
-  React.useEffect(() => {
-    const intervalId = setInterval(() => {
-      if (keycloak.authenticated) {
-        keycloak
-          .updateToken(300)
-          .then((refreshed) => {
-            if (refreshed) {
-              console.log("Token successfully refreshed");
-            } else {
-              console.log("Token is still valid");
-            }
-          })
-          .catch(() => {
-            console.error("Failed to refresh token");
-            keycloak.login({locale:"tr"});
-          });
-      }
-    }, 4 * 60 * 1000);
-    return () => clearInterval(intervalId);
-  }, [keycloak.authenticated]);
+  }, [initialized, keycloak.authenticated]);
 
   const matchPath = (routePath, currentPath) => {
-    const regexPattern = new RegExp("^" + routePath.replace(/:[^/]+/g, "([^/]+)") + "$");
+    const regexPattern = new RegExp(
+      "^" + routePath.replace(/:[^/]+/g, "([^/]+)") + "$"
+    );
     return regexPattern.test(currentPath);
   };
 
   const getActiveRoute = (routes) => {
     for (let i = 0; i < routes.length; i++) {
-      const fullPath = `${routes[i].layout}/${routes[i].path}`.replace(/\/+/g, '/'); // Gereksiz '/' temizlendi
+      const fullPath = `${routes[i].layout}/${routes[i].path}`.replace(
+        /\/+/g,
+        "/"
+      );
 
       if (matchPath(fullPath, window.location.pathname)) {
         return routes[i].name;
@@ -81,23 +66,16 @@ export default function Admin(props) {
     }
     return activeNavbar;
   };
+
   const getRoutes = (routes) => {
-    return routes.map((route, key) => {
-      if (route.layout === "/admin") {
-        return (
-          <>
-            <Route
-              key={key}
-              path={`/${route.path}`}
-              element={route.component}
-            />
-            {route.childRoutes && getRoutes(route.childRoutes)}
-          </>
-        );
-      } else {
-        return null;
-      }
-    });
+    return routes
+      .filter((route) => route.layout === "/admin")
+      .map((route, key) => (
+        <Fragment key={key}>
+          <Route path={`/${route.path}`} element={route.component} />
+          {route.childRoutes && getRoutes(route.childRoutes)}
+        </Fragment>
+      ));
   };
 
   document.documentElement.dir = "ltr";
@@ -111,7 +89,7 @@ export default function Admin(props) {
         <main
           className={`mx-[12px] h-full flex-none transition-all md:pr-2 xl:ml-[313px]`}
         >
-          {/* Routes */}
+          {/* Navbar */}
           <div className="h-full">
             <Navbar
               onOpenSidenav={() => setOpen(true)}
@@ -121,16 +99,22 @@ export default function Admin(props) {
               keycloak={keycloak}
               {...rest}
             />
-            <div className="pt-5s mx-auto mb-auto h-full min-h-[84vh] p-2 md:pr-2">
-              <Routes>
-                {getRoutes(routes)}
-                <Route
-                  path="/"
-                  element={<Navigate to="/admin/default" replace />}
-                />
-                <Route path="*" element={<div>404 NOT FOUND</div>} />
-              </Routes>
-            </div>
+            {/* Routes */}
+            {initialized && keycloak.authenticated && (
+                <div className="pt-5s mx-auto mb-auto h-full min-h-[84vh] p-2 md:pr-2">
+                  <Routes>
+                    {getRoutes(routes)}
+                    <Route
+                        path="/"
+                        element={<Navigate to="/admin/dashboard" replace />}
+                    />
+                    <Route
+                        path="*"
+                        element={<div className="mt-4">404 NOT FOUND</div>}
+                    />
+                  </Routes>
+                </div>
+            )}
             <div className="p-3">
               <Footer />
             </div>
