@@ -130,7 +130,7 @@ const PlayerDialog = (props) => {
                 </div>
               </div>
               {filteredMedia?.url && (
-                  <div className="p-4">
+                  <div className="mb-4 p-4">
                     <p className="mb-2 text-sm text-gray-700">Seçilen Video</p>
                     <iframe
                         className="w-full max-w-2xl h-96"
@@ -142,13 +142,13 @@ const PlayerDialog = (props) => {
                     />
                   </div>
               )}
-              <div className="mt-4 flex justify-center">
+              <div className="flex justify-center">
                 <button
                     type="button"
                     onClick={onClose}
                     className="mr-2 cursor-pointer rounded-md bg-red-500 px-4 py-2 font-bold text-white"
                 >
-                  Kapat
+                  Close
                 </button>
               </div>
             </Dialog.Panel>

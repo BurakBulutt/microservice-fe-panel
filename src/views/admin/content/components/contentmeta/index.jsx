@@ -153,7 +153,6 @@ const ContentMeta = (props) => {
   const handleSelect = (data) => {
     if (!selectedCategoryList.map(item => item.id).includes(data.id)) {
       setSelectedCategoryList([...selectedCategoryList, data]);
-      //formik.setFieldValue("categories", [...formik.values?.categories,data]);
     }else{
       toast.warn("Item Already Selected",{
         position : 'top-center',
@@ -164,7 +163,6 @@ const ContentMeta = (props) => {
 
   const handleUnSelect = (data) => {
     setSelectedCategoryList(selectedCategoryList.filter(item => item.id !== data.id))
-    //formik.setFieldValue("categories", formik.values?.categories?.filter(item => item.id !== data.id));
   }
 
   const onClose = (e) => {
@@ -269,7 +267,7 @@ const ContentMeta = (props) => {
               placeholder="Content Name"
               name="name"
               type="text"
-              state={formik.errors.name && "error"}
+              state={formik.errors.name && submitted &&"error"}
               value={formik.values?.name}
               onChange={(e) => {
                 formik.handleChange(e);
@@ -286,7 +284,7 @@ const ContentMeta = (props) => {
               placeholder="Start Date"
               name="startDate"
               type="date"
-              state={formik.errors.startDate && "error"}
+              state={formik.errors.startDate && submitted && "error"}
               value={formik.values.startDate}
               onChange={formik.handleChange}
             />
@@ -303,7 +301,7 @@ const ContentMeta = (props) => {
               placeholder="Content Slug"
               name="slug"
               type="text"
-              state={formik.errors.slug && "error"}
+              state={formik.errors.slug && submitted && "error"}
               value={formik.values.slug}
             />
             {formik.errors.slug && submitted && (
@@ -339,7 +337,7 @@ const ContentMeta = (props) => {
               label="Episode Time"
               name="episodeTime"
               type="number"
-              state={formik.errors.episodeTime && "error"}
+              state={formik.errors.episodeTime && submitted && "error"}
               value={formik.values?.episodeTime}
               onChange={(e) => {
                 formik.handleChange(e);
@@ -360,7 +358,7 @@ const ContentMeta = (props) => {
               placeholder="Content Description"
               name="description"
               type="text"
-              state={formik.errors.description && "error"}
+              state={formik.errors.description && submitted && "error"}
               value={formik.values?.description}
               onChange={formik.handleChange}
             />
@@ -414,7 +412,6 @@ const ContentMeta = (props) => {
         </div>
       </div>
 
-      {/* URL Dialog */}
       <Dialog
         open={isVisible}
         onClose={closeModal}
@@ -449,4 +446,5 @@ const ContentMeta = (props) => {
     </div>
   );
 };
+
 export default ContentMeta;

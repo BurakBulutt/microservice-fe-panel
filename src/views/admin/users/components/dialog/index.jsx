@@ -1,7 +1,7 @@
 import { Dialog } from "@headlessui/react";
 import React from "react";
-import Switch from "../../../../components/switch";
-import InputField from "../../../../components/fields/InputField";
+import Switch from "../../../../../components/switch";
+import InputField from "../../../../../components/fields/InputField";
 
 const UserDialog = (props) => {
   const {formik,dialogVisible,hideDialog,submitted,handleSubmitFormik} = props;
@@ -158,14 +158,14 @@ const UserDialog = (props) => {
               onClick={hideDialog}
               className="cursor-pointer mr-2 rounded-md bg-red-500 px-4 py-2 font-bold text-white"
             >
-              İptal
+              Close
             </button>
             <button
               type="button"
               className="cursor-pointer rounded-md bg-green-500 px-4 py-2 font-bold text-white"
               onClick={handleSubmitFormik}
             >
-              {formik.values?.id ? "Güncelle" : "Kaydet"}
+              {formik.values?.id ? "Save" : "Update"}
             </button>
           </div>
         </Dialog.Panel>

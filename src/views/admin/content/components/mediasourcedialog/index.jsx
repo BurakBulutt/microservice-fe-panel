@@ -174,7 +174,7 @@ const MediaSourceDialog = (props) => {
                   className="w-full cursor-pointer rounded-md bg-green-500 px-4 py-2 font-bold text-white"
                   onClick={handleAddMediaSource}
               >
-                {"Ekle"}
+                Add
               </button>
               <div className="mt-4 flex justify-end">
                 <button
@@ -182,7 +182,7 @@ const MediaSourceDialog = (props) => {
                     onClick={onClose}
                     className="mr-2 cursor-pointer rounded-md bg-red-500 px-4 py-2 font-bold text-white"
                 >
-                  İptal
+                  Close
                 </button>
                 <button
                     type="button"
@@ -192,7 +192,7 @@ const MediaSourceDialog = (props) => {
                       onClose();
                     }}
                 >
-                  {"Kaydet"}
+                  Save
                 </button>
               </div>
             </Dialog.Panel>

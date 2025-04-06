@@ -41,7 +41,6 @@ const routes = [
     path: "nft-marketplace",
     icon: <MdOutlineShoppingCart className="h-6 w-6" />,
     component: <NFTMarketplace />,
-    secondary: true,
   },
   {
     name: "Data Tables",
@@ -88,13 +87,15 @@ const routes = [
       {
         name: "Create Content",
         layout: "/admin",
-        path: "contents/create",
+        parentPath: "contents",
+        path: "create",
         component: <ContentCard />
       },
       {
         name: "Update Content",
         layout: "/admin",
-        path: "contents/update/:id",
+        parentPath: "contents",
+        path: "update/:id",
         component: <ContentCard />
       }
     ]

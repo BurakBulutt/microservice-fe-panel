@@ -31,6 +31,9 @@ const createRequest = async (uri, method, data, params) => {
     return await api(config);
   } catch (error) {
     console.error(error);
+    if (error.status === 401) {
+      keycloak.login({redirectUri: window.location.origin});
+    }
     throw error;
   }
 };

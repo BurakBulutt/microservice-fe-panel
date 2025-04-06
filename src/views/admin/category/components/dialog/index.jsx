@@ -36,14 +36,14 @@ const CategoryDialog = (props) => {
                                 placeholder="name"
                                 name="name"
                                 type="text"
-                                state={formik.errors.name && "error"}
+                                state={formik.errors.name && submitted && "error"}
                                 value={formik.values?.name}
                                 onChange={(e) => {
                                     formik.handleChange(e);
                                     createSlug(e.target.value);
                                 }}
                             />
-                            {formik.errors.name && submitted (
+                            {formik.errors.name && submitted &&(
                                 <div className="ml-2 mt-2 text-red-500">{formik.errors.name}</div>
                             )}
                         </div>
@@ -53,13 +53,13 @@ const CategoryDialog = (props) => {
                                 placeholder="description"
                                 name="description"
                                 type="text"
-                                state={formik.errors.description && "error"}
+                                state={formik.errors.description && submitted && "error"}
                                 value={formik.values?.description}
                                 onChange={(e) => {
                                     formik.handleChange(e);
                                 }}
                             />
-                            {formik.errors.description && submitted(
+                            {formik.errors.description && submitted &&(
                                 <div className="ml-2 mt-2 text-red-500">{formik.errors.description}</div>
                             )}
                         </div>
@@ -70,27 +70,27 @@ const CategoryDialog = (props) => {
                                 placeholder="Content Slug"
                                 name="slug"
                                 type="text"
-                                state={formik.errors.slug && "error"}
+                                state={formik.errors.slug && submitted && "error"}
                                 value={formik.values.slug}
                             />
-                            {formik.errors.slug && submitted(
+                            {formik.errors.slug && submitted &&(
                                 <div className="ml-2 mt-2 text-red-500">{formik.errors.slug}</div>
                             )}
                         </div>
-                        <div className="flex justify-end">
+                        <div className="flex justify-end gap-2">
                             <button
                                 type="button"
                                 onClick={hideDialog}
-                                className="mr-2 cursor-pointer rounded-md bg-red-500 px-4 py-2 font-bold text-white"
+                                className="cursor-pointer rounded-md bg-red-500 px-4 py-2 font-bold text-white"
                             >
-                                İptal
+                                Close
                             </button>
                             <button
                                 type="button"
                                 className="cursor-pointer rounded-md bg-green-500 px-4 py-2 font-bold text-white"
                                 onClick={handleSubmitFormik}
                             >
-                                {"Kaydet"}
+                                Save
                             </button>
                         </div>
                     </Dialog.Panel>

@@ -59,13 +59,13 @@ const CommentDialog = (props) => {
                   onChange={handleEvent}
                 />
               </div>
-              <div className="flex justify-end">
+              <div className="flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="mr-2 cursor-pointer rounded-md bg-red-500 px-4 py-2 font-bold text-white"
+                  className="cursor-pointer rounded-md bg-red-500 px-4 py-2 font-bold text-white"
                 >
-                  İptal
+                  Close
                 </button>
                 <button
                     disabled={fieldState === "error"}
@@ -76,7 +76,7 @@ const CommentDialog = (props) => {
                     onClose();
                   }}
                 >
-                  {"Kaydet"}
+                  Save
                 </button>
               </div>
             </Dialog.Panel>

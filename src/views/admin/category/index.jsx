@@ -1,13 +1,12 @@
 import DefaultTable from "../../../components/table/CheckTable";
 import { categoryColumnsData } from "../../../components/table/columnsData";
 import React, { useEffect, useState } from "react";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import {FaEdit, FaPlus, FaTrash} from "react-icons/fa";
 import { useKeycloak } from "@react-keycloak/web";
 import { toast } from "react-toastify";
 import { useFormik } from "formik";
 import { CategoryValidationSchema } from "../../../utils/validation/ValidationSchemas";
 import CategoryDialog from "./components/dialog";
-import { useDisclosure } from "@chakra-ui/hooks";
 import { CategoryService } from "../../../service/CategoryService";
 
 const Category = (props) => {
@@ -109,8 +108,9 @@ const Category = (props) => {
     setDialogVisible(true);
   };
   const handleSubmitFormik = () => {
-    setSubmitted(true);
     formik.handleSubmit();
+    setSubmitted(true);
+    setDialogVisible(false);
   };
   const handleSelect = (e, id) => {
     if (e.target.checked) {
@@ -139,29 +139,30 @@ const Category = (props) => {
 
   const header = () => {
     return props.header ? props.header : (
-      <div className="flex items-center justify-between space-x-4 py-4">
-        <button
-          className="rounded-xl bg-green-500 px-5 py-3 text-base font-bold text-white transition duration-200 hover:bg-green-600 active:bg-green-700 dark:bg-green-400 dark:text-white dark:hover:bg-green-300 dark:active:bg-green-200"
-          onClick={() => {
-            handleCreate();
-          }}
-        >
-          Yeni
-        </button>
-        <button
-          className={`rounded-xl px-5 py-3 text-base font-bold text-white transition duration-200 dark:text-white dark:hover:bg-red-300 dark:active:bg-red-200 
+        <div className="flex items-center justify-between space-x-4 py-4">
+          <button
+              className="flex flex-col gap-2 items-center rounded-xl bg-green-500 px-5 py-3 text-base font-bold text-white transition duration-200 hover:bg-green-600 active:bg-green-700 dark:bg-green-400 dark:text-white dark:hover:bg-green-300 dark:active:bg-green-200"
+              onClick={() => handleCreate()}
+          >
+            <FaPlus/>
+            Yeni
+          </button>
+
+          <button
+              className={`flex flex-col gap-2 items-center rounded-xl px-5 py-3 text-base font-bold text-white transition duration-200 dark:text-white dark:hover:bg-red-300 dark:active:bg-red-200 
                     ${
-                      selectedItems.length === 0
-                        ? "cursor-not-allowed bg-red-300"
-                        : "bg-red-500 hover:bg-red-600 active:bg-red-700 dark:bg-red-400"
-                    }`}
-          onClick={() => {
-            console.log(selectedItems);
-          }}
-        >
-          Toplu Sil
-        </button>
-      </div>
+                  selectedItems.length === 0
+                      ? "cursor-not-allowed bg-red-300"
+                      : "bg-red-500 hover:bg-red-600 active:bg-red-700 dark:bg-red-400"
+              }`}
+              onClick={() => {
+                console.log(selectedItems);
+              }}
+          >
+            <FaTrash/>
+            Toplu Sil
+          </button>
+        </div>
     );
   };
   const actionButtons = (data) => {

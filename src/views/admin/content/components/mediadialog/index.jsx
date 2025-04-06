@@ -66,20 +66,20 @@ const MediaDialog = (props) => {
                             <div className="ml-2 mt-2 text-red-500">{formik.errors.publishDate}</div>
                         )}
                     </div>
-                    <div className="flex justify-end">
+                    <div className="flex justify-end gap-2">
                         <button
                             type="button"
                             onClick={hideDialog}
-                            className="cursor-pointer mr-2 rounded-md bg-red-500 px-4 py-2 font-bold text-white"
+                            className="cursor-pointer rounded-md bg-red-500 px-4 py-2 font-bold text-white"
                         >
-                            İptal
+                            Close
                         </button>
                         <button
                             type="button"
                             className="cursor-pointer rounded-md bg-green-500 px-4 py-2 font-bold text-white"
                             onClick={handleSubmitFormik}
                         >
-                            {formik.values?.id ? "Güncelle" : "Kaydet"}
+                            {formik.values?.id ? "Save" : "Update"}
                         </button>
                     </div>
                 </Dialog.Panel>

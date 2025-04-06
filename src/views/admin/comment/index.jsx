@@ -87,16 +87,17 @@ const Comment = (props) => {
     return (
       <div className="flex items-center justify-between space-x-4 py-4">
         <button
-          className={`rounded-xl px-5 py-3 text-base font-bold text-white transition duration-200 dark:text-white dark:hover:bg-red-300 dark:active:bg-red-200 
+            className={`flex flex-col gap-2 items-center rounded-xl px-5 py-3 text-base font-bold text-white transition duration-200 dark:text-white dark:hover:bg-red-300 dark:active:bg-red-200 
                     ${
-                      selectedItems.length === 0
-                        ? "cursor-not-allowed bg-red-300"
-                        : "bg-red-500 hover:bg-red-600 active:bg-red-700 dark:bg-red-400"
-                    }`}
-          onClick={() => {
-            console.log(selectedItems);
-          }}
+                selectedItems.length === 0
+                    ? "cursor-not-allowed bg-red-300"
+                    : "bg-red-500 hover:bg-red-600 active:bg-red-700 dark:bg-red-400"
+            }`}
+            onClick={() => {
+              console.log(selectedItems);
+            }}
         >
+          <FaTrash/>
           Toplu Sil
         </button>
       </div>

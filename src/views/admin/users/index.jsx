@@ -1,8 +1,8 @@
 import { usersColumnsData } from "../../../components/table/columnsData";
-import { FaEdit, FaMailBulk, FaTrash, FaUserLock } from "react-icons/fa";
+import {FaEdit, FaMailBulk, FaPlus, FaTrash, FaUserLock} from "react-icons/fa";
 import React, { useEffect, useState } from "react";
 import { UserService } from "../../../service/UserService";
-import UserDialog from "./components/UserDialog";
+import UserDialog from "./components/dialog";
 import { useFormik } from "formik";
 import { toast } from "react-toastify";
 import {
@@ -242,23 +242,25 @@ const Users = (props) => {
     return (
       <div className="flex items-center justify-between space-x-4 py-4">
         <button
-          className="rounded-xl bg-green-500 px-5 py-3 text-base font-bold text-white transition duration-200 hover:bg-green-600 active:bg-green-700 dark:bg-green-400 dark:text-white dark:hover:bg-green-300 dark:active:bg-green-200"
-          onClick={() => {
-            handleCreate();
-          }}
+          className="flex flex-col gap-2 items-center rounded-xl bg-green-500 px-5 py-3 text-base font-bold text-white transition duration-200 hover:bg-green-600 active:bg-green-700 dark:bg-green-400 dark:text-white dark:hover:bg-green-300 dark:active:bg-green-200"
+          onClick={() => handleCreate()}
         >
+          <FaPlus/>
           Yeni
         </button>
 
         <button
-          className={`rounded-xl px-5 py-3 text-base font-bold text-white transition duration-200 dark:text-white dark:hover:bg-red-300 dark:active:bg-red-200 
+          className={`flex flex-col gap-2 items-center rounded-xl px-5 py-3 text-base font-bold text-white transition duration-200 dark:text-white dark:hover:bg-red-300 dark:active:bg-red-200 
                     ${
                       selectedItems.length === 0
                         ? "cursor-not-allowed bg-red-300"
                         : "bg-red-500 hover:bg-red-600 active:bg-red-700 dark:bg-red-400"
                     }`}
-          onClick={() => {}}
+          onClick={() => {
+            console.log(selectedItems);
+          }}
         >
+          <FaTrash/>
           Toplu Sil
         </button>
       </div>
