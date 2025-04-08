@@ -8,6 +8,7 @@ import {ReactKeycloakProvider} from "@react-keycloak/web";
 import {keycloak} from "./utils/keycloak/keycloakConfig";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import "./i18n";
 
 const App = () => {
   const initOptions = {

@@ -11,6 +11,8 @@ const typeOptions = [
   },
 ];
 
+const commentOptions = ["COMMENT","REPLY"];
+
 export const UserCreateValidationSchema = Yup.object({
   firstName: Yup.string().required("Name is Required"),
   lastName: Yup.string().required("Surname is Required"),
@@ -58,5 +60,24 @@ export const CategoryValidationSchema = Yup.object({
   name: Yup.string().required("Name is Required"),
   description: Yup.string().required("Description is Required"),
   slug: Yup.string().required("Slug is Required"),
+});
+
+export const CommentCreateValidationSchema = Yup.object({
+  content: Yup.string().required("Content is Required"),
+  userId: Yup.string().required("User is Required").nonNullable(),
+  targetId: Yup.string().required("Target is Required").nonNullable(),
+  type: Yup.string()
+      .required("Type is Required")
+      .oneOf(commentOptions),
+  parentId: Yup.string()
+      .when("type", {
+        is: "REPLY",
+        then: (schema) => schema.required("Parent is Required").nonNullable(),
+        otherwise: (schema) => schema.notRequired().nullable(),
+      }),
+});
+
+export const CommentUpdateValidationSchema = Yup.object({
+  content: Yup.string().required("Content is Required"),
 });
 

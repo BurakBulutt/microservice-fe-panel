@@ -2,7 +2,6 @@ import React from "react";
 
 import {Dialog} from "@headlessui/react";
 import {useDisclosure} from "@chakra-ui/hooks";
-import {FaCheck, FaDiscord, FaTimes} from "react-icons/fa";
 
 const SelectDialog=(props) => {
     const {extra,buttonText,component} = props;
@@ -48,7 +47,7 @@ const SelectDialog=(props) => {
                       className="cursor-pointer rounded-md bg-green-500 px-4 py-2 font-bold text-white"
                       onClick={(e) => {
                           props.onSave(e);
-                          onClose();
+                          onClose(e);
                       }}
                   >
                       Save

@@ -24,17 +24,61 @@ import Content from "./views/admin/content";
 import ContentCard from "./views/admin/content/components/contentcard";
 import Comment from "./views/admin/comment";
 import Category from "./views/admin/category";
-import {SiContentful} from "react-icons/si";
-import {BiCategory, BiComment, BiUser} from "react-icons/bi";
+import { SiContentful } from "react-icons/si";
+import { BiCategory, BiComment, BiUser } from "react-icons/bi";
 
 const routes = [
   {
-    name: "Main Dashboard",
+    name: "mainDashboard",
     layout: "/admin",
     path: "dashboard",
     icon: <MdHome className="h-6 w-6" />,
     component: <MainDashboard />,
   },
+  {
+    name: "user",
+    layout: "/admin",
+    path: "users",
+    icon: <BiUser className="h-6 w-6" />,
+    component: <Users />,
+  },
+  {
+    name: "content",
+    layout: "/admin",
+    path: "contents",
+    icon: <SiContentful className="h-6 w-6" />,
+    component: <Content />,
+  },
+  {
+    name: "createContent",
+    layout: "/admin",
+    parentPath: "contents",
+    path: "create",
+    component: <ContentCard />,
+  },
+  {
+    name: "updateContent",
+    layout: "/admin",
+    parentPath: "contents",
+    path: "update/:id",
+    component: <ContentCard />,
+  },
+  {
+    name: "comment",
+    layout: "/admin",
+    path: "comments",
+    icon: <BiComment className="h-6 w-6" />,
+    component: <Comment />,
+  },
+  {
+    name: "category",
+    layout: "/admin",
+    path: "categories",
+    icon: <BiCategory className="h-6 w-6" />,
+    component: <Category />,
+  },
+];
+const oldRoutes = [
   {
     name: "NFT Marketplace",
     layout: "/admin",
@@ -69,50 +113,6 @@ const routes = [
     path: "rtl",
     icon: <MdHome className="h-6 w-6" />,
     component: <RTLDefault />,
-  },
-  {
-    name: "User",
-    layout: "/admin",
-    path: "users",
-    icon: <BiUser className="h-6 w-6" />,
-    component: <Users />,
-  },
-  {
-    name: "Content",
-    layout: "/admin",
-    path: "contents",
-    icon: <SiContentful className="h-6 w-6" />,
-    component: <Content />,
-    childRoutes: [
-      {
-        name: "Create Content",
-        layout: "/admin",
-        parentPath: "contents",
-        path: "create",
-        component: <ContentCard />
-      },
-      {
-        name: "Update Content",
-        layout: "/admin",
-        parentPath: "contents",
-        path: "update/:id",
-        component: <ContentCard />
-      }
-    ]
-  },
-  {
-    name: "Comment",
-    layout: "/admin",
-    path: "comments",
-    icon: <BiComment className="h-6 w-6" />,
-    component: <Comment />,
-  },
-  {
-    name: "Category",
-    layout: "/admin",
-    path: "categories",
-    icon: <BiCategory className="h-6 w-6" />,
-    component: <Category />,
   },
 ];
 export default routes;

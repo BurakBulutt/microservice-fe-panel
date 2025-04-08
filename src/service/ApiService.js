@@ -12,6 +12,10 @@ const api = axios.create({
 const createRequest = async (uri, method, data, params) => {
   const token = keycloak.authenticated ? keycloak.token : undefined;
 
+  if (keycloak.didInitialize && !token) {
+    keycloak.login({redirectUri: window.location.origin});
+  }
+
   const config = {
     method,
     url: uri,
@@ -31,6 +35,7 @@ const createRequest = async (uri, method, data, params) => {
     return await api(config);
   } catch (error) {
     console.error(error);
+
     if (error.status === 401) {
       keycloak.login({redirectUri: window.location.origin});
     }

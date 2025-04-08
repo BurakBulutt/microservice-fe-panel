@@ -2,20 +2,20 @@ import React, { useState } from "react";
 import Dropdown from "components/dropdown";
 import { FiAlignJustify } from "react-icons/fi";
 import { Link } from "react-router-dom";
-import navbarimage from "assets/img/layout/Navbar.png";
-import { BsArrowBarUp } from "react-icons/bs";
+
 import { FiSearch } from "react-icons/fi";
 import { RiMoonFill, RiSunFill } from "react-icons/ri";
-import {
-  IoMdNotificationsOutline,
-  IoMdInformationCircleOutline,
-} from "react-icons/io";
+
 import avatar from "assets/img/avatars/avatar4.png";
+import i18n from "i18next";
+import { useTranslation } from "react-i18next";
 
 const Navbar = (props) => {
   const { onOpenSidenav, currentRoute, keycloak, breadCrumb } = props;
   const [darkmode, setDarkmode] = React.useState(false);
   const [userProfile, setUserProfile] = useState({});
+  const [locale, setLocale] = useState("tr");
+  const { t } = useTranslation();
 
   React.useEffect(() => {
     if (keycloak.authenticated === true) {
@@ -27,6 +27,15 @@ const Navbar = (props) => {
         .catch((err) => console.log(err));
     }
   }, [keycloak.authenticated]);
+
+  React.useEffect(() => {
+    i18n.changeLanguage(locale);
+  }, [locale]);
+
+  const localeOptions = [
+    { code: "en", label: "English", icon: <span className="text-lg">🇺🇸</span> },
+    { code: "tr", label: "Turkish", icon: <span className="text-lg">🇹🇷</span> },
+  ];
 
   const getPath = (route, routes) => {
     if (route.parentPath) {
@@ -47,7 +56,7 @@ const Navbar = (props) => {
             className="text-sm font-normal text-navy-700 hover:underline dark:text-white dark:hover:text-white"
             href="/"
           >
-            Pages
+            {t("pages")}
             <span className="mx-1 text-sm text-navy-700 hover:text-navy-700 dark:text-white">
               {" "}
               /{" "}
@@ -65,7 +74,7 @@ const Navbar = (props) => {
                 }`}
                 to={isLast ? "#" : getPath(bc, breadCrumb)}
               >
-                {bc.name}
+                {t(`${bc?.name}`)}
                 {!isLast && (
                   <span className="mx-1 text-sm text-navy-700 hover:text-navy-700 dark:text-white">
                     {" "}
@@ -81,7 +90,7 @@ const Navbar = (props) => {
             to="#"
             className="font-bold capitalize hover:text-navy-700 dark:hover:text-white"
           >
-            {currentRoute?.name}
+            {t(`${currentRoute?.name}`)}
           </Link>
         </p>
       </div>
@@ -103,6 +112,29 @@ const Navbar = (props) => {
         >
           <FiAlignJustify className="h-5 w-5" />
         </span>
+        {/* 🌍 Locale Dropdown */}
+        <Dropdown
+          button={
+            <div className="flex cursor-pointer items-center gap-1 px-2 py-1 text-lg text-gray-600 dark:text-white">
+              {localeOptions.find((opt) => opt.code === locale)?.icon}
+            </div>
+          }
+          children={
+            <div className="flex w-40 flex-col justify-start rounded-[10px] bg-white p-2 shadow-lg dark:bg-navy-700">
+              {localeOptions.map((option) => (
+                <button
+                  key={option.code}
+                  onClick={() => setLocale(option.code)}
+                  className="flex items-center gap-2 rounded-md p-2 text-sm text-gray-800 hover:bg-gray-100 dark:text-white dark:hover:bg-navy-600"
+                >
+                  {option.icon}
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          }
+          classNames={"py-2 top-8 -left-[60px]"}
+        />
         <div
           className="cursor-pointer text-gray-600"
           onClick={() => {
@@ -132,36 +164,24 @@ const Navbar = (props) => {
           }
           children={
             <div className="flex w-56 flex-col justify-start rounded-[20px] bg-white bg-cover bg-no-repeat shadow-xl shadow-shadow-500 dark:!bg-navy-700 dark:text-white dark:shadow-none">
-              <div className="p-4">
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-bold text-navy-700 dark:text-white">
-                    👋 Hey, {userProfile.firstName + " " + userProfile.lastName}
-                  </p>{" "}
-                </div>
+              <div className="flex flex-col items-center p-4">
+                <p className="text-sm font-bold text-navy-700 dark:text-white">
+                  👋 {t("hey")},{" "}
+                  {userProfile.firstName + " " + userProfile.lastName}
+                </p>
               </div>
+
               <div className="h-px w-full bg-gray-200 dark:bg-white/20 " />
 
-              <div className="flex flex-col p-4">
+              <div className="flex flex-col items-center p-4">
                 <a
                   href="#"
-                  className="text-sm text-gray-800 dark:text-white hover:dark:text-white"
-                >
-                  Profile Settings
-                </a>
-                <a
-                  href="#"
-                  className="mt-3 text-sm text-gray-800 dark:text-white hover:dark:text-white"
-                >
-                  Newsletter Settings
-                </a>
-                <a
-                  href="#"
-                  className="mt-3 text-sm font-medium text-red-500 transition duration-150 ease-out hover:text-red-500 hover:ease-in"
+                  className="text-sm font-medium text-red-500 transition duration-150 ease-out hover:text-red-500 hover:ease-in"
                   onClick={() => {
                     keycloak.logout();
                   }}
                 >
-                  Log Out
+                  {t("logout")}
                 </a>
               </div>
             </div>

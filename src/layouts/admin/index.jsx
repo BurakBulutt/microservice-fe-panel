@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Navbar from "components/navbar";
 import Sidebar from "components/sidebar";
@@ -39,10 +39,7 @@ export default function Admin(props) {
     return routes
       .filter((route) => route.layout === "/admin")
       .map((route, key) => (
-        <Fragment key={key}>
-          <Route path={getPath(route)} element={route.component} />
-          {route.childRoutes && getRoutes(route.childRoutes)}
-        </Fragment>
+          <Route key={key} path={getPath(route)} element={route.component} />
       ));
   };
 
@@ -55,11 +52,6 @@ export default function Admin(props) {
 
       if (matchPath(fullPath,location.pathname)) {
         return routes[i];
-      }
-
-      if (routes[i].childRoutes) {
-        const childRoute = getActiveRoute(routes[i].childRoutes);
-        if (childRoute) return childRoute;
       }
     }
     return null;
@@ -116,7 +108,6 @@ export default function Admin(props) {
           <div className="h-full">
             <Navbar
               onOpenSidenav={() => setOpen(true)}
-              logoText={"Horizon UI Tailwind React"}
               currentRoute={currentRoute}
               breadCrumb={breadCrumb}
               keycloak={keycloak}

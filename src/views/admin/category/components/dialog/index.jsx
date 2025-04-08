@@ -1,9 +1,11 @@
 import { Dialog } from "@headlessui/react";
 import React from "react";
 import InputField from "../../../../../components/fields/InputField";
+import {useTranslation} from "react-i18next";
 
 const CategoryDialog = (props) => {
     const {formik,submitted,dialogVisible,handleSubmitFormik,hideDialog} = props;
+    const {t} = useTranslation();
 
     const createSlug = (name) => {
         const slug = name
@@ -28,12 +30,12 @@ const CategoryDialog = (props) => {
                             as="h3"
                             className="mb-4 text-lg font-medium leading-6 text-gray-900"
                         >
-                            {formik.values?.id ? "Düzenle" : "Ekle"}
+                            {formik.values?.id ? t("update") : t("save")}
                         </Dialog.Title>
                         <div className="mb-4">
                             <InputField
-                                label="Name"
-                                placeholder="name"
+                                label={t("name")}
+                                placeholder={t("name")}
                                 name="name"
                                 type="text"
                                 state={formik.errors.name && submitted && "error"}
@@ -49,8 +51,8 @@ const CategoryDialog = (props) => {
                         </div>
                         <div className="mb-4">
                             <InputField
-                                label="Description"
-                                placeholder="description"
+                                label={t("description")}
+                                placeholder={t("description")}
                                 name="description"
                                 type="text"
                                 state={formik.errors.description && submitted && "error"}
@@ -66,8 +68,8 @@ const CategoryDialog = (props) => {
                         <div className="mb-4">
                             <InputField
                                 disabled={true}
-                                label="Slug"
-                                placeholder="Content Slug"
+                                label={t("slug")}
+                                placeholder={t("slug")}
                                 name="slug"
                                 type="text"
                                 state={formik.errors.slug && submitted && "error"}
@@ -83,14 +85,14 @@ const CategoryDialog = (props) => {
                                 onClick={hideDialog}
                                 className="cursor-pointer rounded-md bg-red-500 px-4 py-2 font-bold text-white"
                             >
-                                Close
+                                {t("close")}
                             </button>
                             <button
                                 type="button"
                                 className="cursor-pointer rounded-md bg-green-500 px-4 py-2 font-bold text-white"
                                 onClick={handleSubmitFormik}
                             >
-                                Save
+                                {t("save")}
                             </button>
                         </div>
                     </Dialog.Panel>

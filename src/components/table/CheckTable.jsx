@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import Checkbox from "components/checkbox";
 import Card from "components/card";
 
@@ -13,20 +13,22 @@ import Lightbox from "react-image-lightbox";
 import "react-image-lightbox/style.css";
 import { TablePagination } from "@mui/material";
 import CustomModal from "../../components/modal/index";
+import { useTranslation } from "react-i18next";
 
 function DefaultTable(props) {
   const { tableData, columnsData } = props;
   const [sorting, setSorting] = useState([]);
   const [openPhotoId, setOpenPhotoId] = useState(null);
-  const [data,setData] = useState([]);
+  const [data, setData] = useState([]);
   const columnHelper = createColumnHelper();
   const columns = createColumns(columnsData);
+  const { t } = useTranslation();
 
   useEffect(() => {
-    if (tableData?.content?.length) {
+    if (tableData?.content) {
       setData(tableData.content);
     }
-  }, [columns]);
+  }, [columns, tableData]);
 
   const table = useReactTable({
     data,
@@ -56,7 +58,7 @@ function DefaultTable(props) {
           id: columnsData.accessor,
           header: () => (
             <p className="text-sm font-bold text-gray-600 dark:text-white">
-              {columnsData.Header}
+              {t(`${columnsData.accessor}`).toUpperCase()}
             </p>
           ),
           cell: (info) =>
@@ -95,11 +97,11 @@ function DefaultTable(props) {
             ) : columnsData.type === "boolean" ? (
               Boolean(info.getValue()) ? (
                 <div className="inline-block rounded-lg bg-green-500 px-3 py-2 text-xs font-bold uppercase text-white transition duration-200 dark:bg-green-400">
-                  {columnsData.booleanTrue}
+                  {t(`${columnsData.booleanTrue}`)}
                 </div>
               ) : (
                 <div className="inline-block rounded-lg bg-red-500 px-3 py-2 text-xs font-bold uppercase text-white transition duration-200 dark:bg-red-400">
-                  {columnsData.booleanFalse}
+                  {t(`${columnsData.booleanFalse}`)}
                 </div>
               )
             ) : columnsData.type === "date" ? (
@@ -116,13 +118,20 @@ function DefaultTable(props) {
                 />
               </div>
             ) : columnsData.type === "modal" ? (
-                <CustomModal title={columnsData.Header} component={props.modalComponent(info.getValue(),columnsData.accessor)}/>
+              <CustomModal
+                title={t(`${columnsData.accessor}`)}
+                component={props.modalComponent(
+                  info.getValue(),
+                  columnsData.accessor
+                )}
+                extra={"linear rounded-xl bg-brand-500 px-4 py-2 text-sm font-medium text-white transition duration-200 hover:bg-brand-600 active:bg-brand-700 dark:bg-brand-400 dark:text-white dark:hover:bg-brand-300 dark:active:bg-brand-200"}
+                buttonText={t("show").toUpperCase()}
+              />
             ) : (
-              //default text
               <p className="text-sm font-bold text-navy-700 dark:text-white">
                 {info.getValue()}
               </p>
-            ),
+            )
         })
       );
     });
@@ -131,7 +140,7 @@ function DefaultTable(props) {
         id: "action",
         header: () => (
           <p className="text-sm font-bold text-gray-600 dark:text-white">
-            ACTION
+            {t("action").toUpperCase()}
           </p>
         ),
         cell: (info) => props.actionButtons(info.row.original),
@@ -160,43 +169,51 @@ function DefaultTable(props) {
       <div className="mt-2 overflow-x-auto">
         <table className="w-full">
           <thead>
-          {table.getHeaderGroups().map((headerGroup) => (
+            {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id} className="!border-px !border-gray-400">
                 {headerGroup.headers.map((header, index) => (
-                    <th
-                        key={header.id}
-                        colSpan={header.colSpan}
-                        className="cursor-pointer border-b-[1px] border-gray-200 pb-2 pr-4 pt-4 text-start"
-                    >
-                      <div className="flex items-center space-x-4">
-                        {index === 0 && (
-                            <Checkbox
-                                defaultChecked={false}
-                                colorScheme="brandScheme"
-                                me="10px"
-                                checked={data?.length && data.every((item) => props.selectedItems.includes(item.id))}
-                                onChange={(e) => {
-                                  const allIds = data.map((item) => item.id);
-                                  props.handleMultipleSelect(e, allIds);
-                                  console.log(sorting);
-                                }}
-                            />
+                  <th
+                    key={header.id}
+                    colSpan={header.colSpan}
+                    className="cursor-pointer border-b-[1px] border-gray-200 pb-2 pr-4 pt-4 text-start"
+                  >
+                    <div className="flex items-center space-x-4">
+                      {index === 0 && (
+                        <Checkbox
+                          defaultChecked={false}
+                          colorScheme="brandScheme"
+                          me="10px"
+                          checked={
+                            data?.length &&
+                            data.every((item) =>
+                              props.selectedItems.includes(item.id)
+                            )
+                          }
+                          onChange={(e) => {
+                            const allIds = data.map((item) => item.id);
+                            props.handleMultipleSelect(e, allIds);
+                            console.log(sorting);
+                          }}
+                        />
+                      )}
+                      <div
+                        className="text-xs text-gray-200"
+                        onClick={header.column.getToggleSortingHandler()}
+                      >
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
                         )}
-                        <div className="text-xs text-gray-200" onClick={header.column.getToggleSortingHandler()}>
-                          {flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                          )}
-                          {{
-                            asc: "",
-                            desc: "",
-                          }[header.column.getIsSorted()] ?? null}
-                        </div>
+                        {{
+                          asc: "",
+                          desc: "",
+                        }[header.column.getIsSorted()] ?? null}
                       </div>
-                    </th>
+                    </div>
+                  </th>
                 ))}
               </tr>
-          ))}
+            ))}
           </thead>
           <tbody>
             {table
@@ -260,4 +277,5 @@ function DefaultTable(props) {
     </Card>
   );
 }
+
 export default DefaultTable;

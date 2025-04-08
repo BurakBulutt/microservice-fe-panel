@@ -13,6 +13,15 @@ export class CommentService {
         );
     }
 
+    async getAllByTarget(params,targetId) {
+        return await createRequest(
+            defaultUrl + `/comment/${targetId}`,
+            "GET",
+            null,
+            params
+        );
+    }
+
     async create(request) {
         return await createRequest(
             defaultUrl,
