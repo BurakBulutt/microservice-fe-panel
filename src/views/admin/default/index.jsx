@@ -61,7 +61,7 @@ const Dashboard = () => {
 
       {/* Tables & Charts */}
       <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-2">
-
+          <WeeklyRevenue />
         {/* Traffic chart & Pie Chart */}
         <div className="grid grid-cols-1 gap-5 rounded-[20px] md:grid-cols-2">
           <DailyTraffic />

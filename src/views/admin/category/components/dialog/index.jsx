@@ -4,7 +4,7 @@ import InputField from "../../../../../components/fields/InputField";
 import {useTranslation} from "react-i18next";
 
 const CategoryDialog = (props) => {
-    const {formik,submitted,dialogVisible,handleSubmitFormik,hideDialog} = props;
+    const {formik,dialogVisible,handleSubmitFormik,hideDialog} = props;
     const {t} = useTranslation();
 
     const createSlug = (name) => {
@@ -25,10 +25,10 @@ const CategoryDialog = (props) => {
                 className="fixed inset-0 z-10 overflow-y-auto"
             >
                 <div className="flex min-h-screen items-center justify-center">
-                    <Dialog.Panel className="z-20 h-full max-h-[80vh]  w-full max-w-lg overflow-y-auto rounded-lg border border-gray-300 bg-white p-6 shadow-lg">
+                    <Dialog.Panel className="z-20 h-full max-h-[80vh]  w-full max-w-lg overflow-y-auto rounded-lg border border-gray-300 bg-white p-6 shadow-lg dark:!bg-navy-900 dark:border-brand-400">
                         <Dialog.Title
                             as="h3"
-                            className="mb-4 text-lg font-medium leading-6 text-gray-900"
+                            className="mb-4 text-lg font-medium leading-6 text-gray-900 dark:text-white"
                         >
                             {formik.values?.id ? t("update") : t("save")}
                         </Dialog.Title>
@@ -38,14 +38,14 @@ const CategoryDialog = (props) => {
                                 placeholder={t("name")}
                                 name="name"
                                 type="text"
-                                state={formik.errors.name && submitted && "error"}
+                                state={formik.errors.name &&  "error"}
                                 value={formik.values?.name}
                                 onChange={(e) => {
                                     formik.handleChange(e);
                                     createSlug(e.target.value);
                                 }}
                             />
-                            {formik.errors.name && submitted &&(
+                            {formik.errors.name && (
                                 <div className="ml-2 mt-2 text-red-500">{formik.errors.name}</div>
                             )}
                         </div>
@@ -55,13 +55,13 @@ const CategoryDialog = (props) => {
                                 placeholder={t("description")}
                                 name="description"
                                 type="text"
-                                state={formik.errors.description && submitted && "error"}
+                                state={formik.errors.description &&  "error"}
                                 value={formik.values?.description}
                                 onChange={(e) => {
                                     formik.handleChange(e);
                                 }}
                             />
-                            {formik.errors.description && submitted &&(
+                            {formik.errors.description && (
                                 <div className="ml-2 mt-2 text-red-500">{formik.errors.description}</div>
                             )}
                         </div>
@@ -72,10 +72,10 @@ const CategoryDialog = (props) => {
                                 placeholder={t("slug")}
                                 name="slug"
                                 type="text"
-                                state={formik.errors.slug && submitted && "error"}
+                                state={formik.errors.slug &&  "error"}
                                 value={formik.values.slug}
                             />
-                            {formik.errors.slug && submitted &&(
+                            {formik.errors.slug && (
                                 <div className="ml-2 mt-2 text-red-500">{formik.errors.slug}</div>
                             )}
                         </div>

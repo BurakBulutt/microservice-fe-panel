@@ -1,4 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import Checkbox from "components/checkbox";
 import Card from "components/card";
 
@@ -6,165 +12,283 @@ import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
+  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 import Lightbox from "react-image-lightbox";
 import "react-image-lightbox/style.css";
-import { TablePagination } from "@mui/material";
 import CustomModal from "../../components/modal/index";
 import { useTranslation } from "react-i18next";
+import enumFactory from "../../utils/enum/enumFactory";
+import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
+import { memo } from "react";
 
-function DefaultTable(props) {
-  const { tableData, columnsData } = props;
-  const [sorting, setSorting] = useState([]);
-  const [openPhotoId, setOpenPhotoId] = useState(null);
-  const [data, setData] = useState([]);
-  const columnHelper = createColumnHelper();
-  const columns = createColumns(columnsData);
+
+const DefaultTable = memo(({ tableData, columnsData,modalComponent,selectedItems,handleSelect,onPageChange,actionButtons,header }) => {
   const { t } = useTranslation();
+  const firstRender = useRef(true);
+  const columnHelper = createColumnHelper();
+  const displayEnumVal = useCallback((data, enumType) => {
+    const type = enumFactory(enumType);
+    const msg = type[data]?.display;
+    return t(`${msg}`)?.toUpperCase();
+  },[t]);
+  const [openPhotoId, setOpenPhotoId] = useState(null);
+  const createColumns = useCallback(
+    (columnsDatas) => {
+      const tableColumns = [];
 
-  useEffect(() => {
-    if (tableData?.content) {
-      setData(tableData.content);
-    }
-  }, [columns, tableData]);
+      columnsDatas
+        .sort((a, b) => a.priority - b.priority)
+        .forEach((columnsData, index) => {
+          tableColumns.push(
+            columnHelper.accessor(columnsData.accessor, {
+              id: columnsData.accessor,
+              header: () => (
+                <p className="text-sm font-bold text-gray-600 dark:text-white">
+                  {columnsData.header
+                    ? t(`${columnsData.header}`).toUpperCase()
+                    : t(`${columnsData.accessor}`).toUpperCase()}
+                </p>
+              ),
+              cell: (info) => {
+                const baseContent =
+                  columnsData.type === "boolean" ? (
+                    Boolean(info.getValue()) ? (
+                      <div className="inline-block rounded-lg bg-green-500 px-3 py-2 text-xs font-bold uppercase text-white transition duration-200 dark:bg-green-400">
+                        {t(`${columnsData.booleanTrue}`)}
+                      </div>
+                    ) : (
+                      <div className="inline-block rounded-lg bg-red-500 px-3 py-2 text-xs font-bold uppercase text-white transition duration-200 dark:bg-red-400">
+                        {t(`${columnsData.booleanFalse}`)}
+                      </div>
+                    )
+                  ) : columnsData.type === "date" ? (
+                    <p className="text-sm font-bold text-navy-700 dark:text-white">
+                      {new Date(info.getValue()).toISOString().split("T")[0]}
+                    </p>
+                  ) : columnsData.type === "image" ? (
+                    <div className="ml-3">
+                      <img
+                        className="h-auto w-full max-w-[100px] rounded-lg object-cover"
+                        onClick={() => setOpenPhotoId(info.row.id)}
+                        src={info.getValue().trim()}
+                        alt="#"
+                      />
+                      {openPhotoId === info.row.id && (
+                        <Lightbox
+                          mainSrc={info.getValue().trim()}
+                          onCloseRequest={() => setOpenPhotoId(null)}
+                        />
+                      )}
+                    </div>
+                  ) : columnsData.type === "modal" ? (
+                    <CustomModal
+                      title={t(`${columnsData.accessor}`)}
+                      component={modalComponent(
+                        info.getValue(),
+                        columnsData.accessor
+                      )}
+                      extra={
+                        "linear rounded-xl bg-brand-500 px-4 py-2 text-sm font-medium text-white transition duration-200 hover:bg-brand-600 active:bg-brand-700 dark:bg-brand-400 dark:text-white dark:hover:bg-brand-300 dark:active:bg-brand-200"
+                      }
+                      buttonText={t("show").toUpperCase()}
+                    />
+                  ) : columnsData.type === "enum" ? (
+                    <p className="text-sm font-bold text-navy-700 dark:text-white">
+                      {displayEnumVal(info.getValue(), columnsData.enumType)}
+                    </p>
+                  ) : columnsData.type === "list" ? (
+                    <div className="flex flex-wrap gap-2">
+                      {info.getValue()?.map((item, i) => (
+                        <div
+                          key={i}
+                          className={`flex justify-center rounded-lg px-3 py-2 text-center text-xs font-bold uppercase text-white transition duration-200 bg-${columnsData.listColor}-500 dark:bg-${columnsData.listColor}-400`}
+                        >
+                          {item[columnsData.nameLabel]}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm font-bold text-navy-700 dark:text-white">
+                      {info.getValue()}
+                    </p>
+                  );
+
+                return index === 0 ? (
+                  <div className="flex items-center gap-4">
+                    <MemoizedCheckbox
+                      checked={selectedItems.includes(
+                        info.row.original.id
+                      )}
+                      onChange={(e) =>
+                        handleSelect(e, info.row.original.id)
+                      }
+                    />
+                    {baseContent}
+                  </div>
+                ) : (
+                  baseContent
+                );
+              },
+            })
+          );
+        });
+
+      tableColumns.push(
+        columnHelper.accessor("action", {
+          id: "action",
+          header: () => (
+            <p className="text-sm font-bold text-gray-600 dark:text-white">
+              {t("action").toUpperCase()}
+            </p>
+          ),
+          cell: (info) => actionButtons(info.row.original),
+        })
+      );
+
+      return tableColumns;
+    },
+    [displayEnumVal, openPhotoId,columnHelper,t,actionButtons,handleSelect,modalComponent,selectedItems]
+  );
+  const columns = useMemo(
+    () => createColumns(columnsData),
+    [columnsData, createColumns]
+  );
+  const data = tableData.content;
+  const pageCount = tableData.page.totalPages;
+  const [sorting, setSorting] = useState([]);
+  const [pagination, setPagination] = useState({
+    pageIndex: tableData.page.number,
+    pageSize: tableData.page.size,
+  });
+
+  const coreRowModel = useMemo(() => getCoreRowModel(), []);
+  const sortedRowModel = useMemo(() => getSortedRowModel(), []);
+  const paginationRowModel = useMemo(() => getPaginationRowModel(), []);
 
   const table = useReactTable({
     data,
     columns,
     state: {
       sorting,
+      pagination,
     },
     onSortingChange: setSorting,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    debugTable: true,
+    onPaginationChange: setPagination,
+    getCoreRowModel: coreRowModel,
+    getSortedRowModel: sortedRowModel,
+    getPaginationRowModel: paginationRowModel,
+    pageCount: pageCount,
+    manualPagination: true,
+    debugTable: false,
   });
 
-  const openLightbox = (id) => {
-    setOpenPhotoId(id);
-  };
-
-  const closeLightbox = () => {
-    setOpenPhotoId(null);
-  };
-
-  function createColumns(columnsDatas) {
-    const tableColumns = [];
-    columnsDatas.forEach((columnsData, index) => {
-      tableColumns.push(
-        columnHelper.accessor(columnsData.accessor, {
-          id: columnsData.accessor,
-          header: () => (
-            <p className="text-sm font-bold text-gray-600 dark:text-white">
-              {t(`${columnsData.accessor}`).toUpperCase()}
-            </p>
-          ),
-          cell: (info) =>
-            index === 0 ? (
-              <div className="flex items-center">
-                <Checkbox
-                  defaultChecked={false}
-                  colorScheme="brandScheme"
-                  me="10px"
-                  checked={props.selectedItems?.includes(info.row.original.id)}
-                  onChange={(e) => {
-                    props.handleSelect(e, info.row.original.id);
-                  }}
-                />
-                {columnsData.type === "image" ? (
-                  <div className="ml-3">
-                    <img
-                      className="h-auto w-full max-w-[100px] rounded-lg object-cover"
-                      onClick={() => openLightbox(info.row.id)}
-                      src={info.getValue().trim()}
-                      alt="#"
-                    />
-                    {openPhotoId === info.row.id && (
-                      <Lightbox
-                        mainSrc={info.getValue().trim()}
-                        onCloseRequest={closeLightbox}
-                      />
-                    )}
-                  </div>
-                ) : (
-                  <p className="ml-3 text-sm font-bold text-navy-700 dark:text-white">
-                    {info.getValue()}
-                  </p>
-                )}
-              </div>
-            ) : columnsData.type === "boolean" ? (
-              Boolean(info.getValue()) ? (
-                <div className="inline-block rounded-lg bg-green-500 px-3 py-2 text-xs font-bold uppercase text-white transition duration-200 dark:bg-green-400">
-                  {t(`${columnsData.booleanTrue}`)}
-                </div>
-              ) : (
-                <div className="inline-block rounded-lg bg-red-500 px-3 py-2 text-xs font-bold uppercase text-white transition duration-200 dark:bg-red-400">
-                  {t(`${columnsData.booleanFalse}`)}
-                </div>
-              )
-            ) : columnsData.type === "date" ? (
-              <p className="text-sm font-bold text-navy-700 dark:text-white">
-                {new Date(info.getValue()).toISOString().split("T")[0]}
-              </p>
-            ) : columnsData.type === "image" ? (
-              <div>
-                <img
-                  className="h-auto w-full max-w-[100px] rounded-lg object-cover"
-                  onClick={() => openLightbox(info.row.id)}
-                  src={info.getValue()}
-                  alt="#"
-                />
-              </div>
-            ) : columnsData.type === "modal" ? (
-              <CustomModal
-                title={t(`${columnsData.accessor}`)}
-                component={props.modalComponent(
-                  info.getValue(),
-                  columnsData.accessor
-                )}
-                extra={"linear rounded-xl bg-brand-500 px-4 py-2 text-sm font-medium text-white transition duration-200 hover:bg-brand-600 active:bg-brand-700 dark:bg-brand-400 dark:text-white dark:hover:bg-brand-300 dark:active:bg-brand-200"}
-                buttonText={t("show").toUpperCase()}
-              />
-            ) : (
-              <p className="text-sm font-bold text-navy-700 dark:text-white">
-                {info.getValue()}
-              </p>
-            )
-        })
-      );
-    });
-    tableColumns.push(
-      columnHelper.accessor("action", {
-        id: "action",
-        header: () => (
-          <p className="text-sm font-bold text-gray-600 dark:text-white">
-            {t("action").toUpperCase()}
-          </p>
-        ),
-        cell: (info) => props.actionButtons(info.row.original),
-      })
-    );
-    return tableColumns;
-  }
-
-  const rowsPerPage = (totalElements) => {
-    let array = [10];
-    if (totalElements > 10) array.push(25);
-    if (totalElements > 25) array.push(50);
-    if (totalElements > 50) {
-      if (Math.floor(totalElements / 2) > 50)
-        array.push(Math.floor(totalElements / 2));
-      array.push(totalElements);
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
     }
-    return array;
+    onPageChange(pagination.pageIndex, pagination.pageSize);
+  }, [pagination.pageIndex, pagination.pageSize,onPageChange]);
+
+  const getPageOptions = () => {
+    const totalElements = tableData.page.totalElements;
+    const baseOptions = [1, 10, 20, 50];
+
+    const allSmaller = baseOptions.every((opt) => totalElements > opt);
+
+    const options = [...baseOptions];
+    if (allSmaller) {
+      options.push(totalElements);
+    }
+
+    return options;
   };
+
+  const Pagination = () => {
+    const currentPage = table.getState().pagination.pageIndex + 1;
+    const pageCount = table.getPageCount();
+    const isPreviousPage = table.getCanPreviousPage();
+    const isNextPage = table.getCanNextPage();
+
+    const getPageNumbers = () => {
+      const pages = [];
+
+      if (currentPage > 1) {
+        pages.push(currentPage - 1);
+      }
+
+      pages.push(currentPage);
+
+      if (currentPage < pageCount) {
+        pages.push(currentPage + 1);
+      }
+
+      return pages;
+    };
+
+    const pageNumbers = getPageNumbers();
+
+    return (
+      <div className="flex items-center space-x-2">
+        {isPreviousPage && (
+          <button
+            onClick={() => table.previousPage()}
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-800 dark:border-gray-500 dark:bg-navy-900 dark:text-white"
+          >
+            <FaAngleLeft size={12} />
+          </button>
+        )}
+
+        {pageNumbers.map((page) => (
+          <button
+            key={page}
+            onClick={() => table.setPageIndex(page - 1)}
+            className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold ${
+              page === currentPage
+                ? "bg-brand-500 text-white dark:bg-brand-400"
+                : "border border-gray-300 bg-white text-gray-800 dark:border-gray-400 dark:bg-navy-900 dark:text-white"
+            }`}
+          >
+            {page}
+          </button>
+        ))}
+
+        {isNextPage && (
+          <button
+            onClick={() => table.nextPage()}
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-800 dark:border-gray-500 dark:bg-navy-900 dark:text-white"
+          >
+            <FaAngleRight size={12} />
+          </button>
+        )}
+      </div>
+    );
+  };
+
+  const MemoizedCheckbox = React.memo(
+    ({ checked, onChange }) => {
+      return (
+        <Checkbox
+          defaultChecked={false}
+          colorScheme="brandScheme"
+          me="10px"
+          checked={checked}
+          onChange={onChange}
+        />
+      );
+    },
+    (prevProps, nextProps) =>
+      prevProps.checked === nextProps.checked &&
+      prevProps.onChange === nextProps.onChange
+  );
 
   return (
     <Card extra={"w-full h-full sm:overflow-auto px-6"}>
       <header className="relative flex items-center justify-between pt-4">
-        {props.header()}
+        {header()}
       </header>
       <div className="mt-2 overflow-x-auto">
         <table className="w-full">
@@ -179,21 +303,16 @@ function DefaultTable(props) {
                   >
                     <div className="flex items-center space-x-4">
                       {index === 0 && (
-                        <Checkbox
-                          defaultChecked={false}
-                          colorScheme="brandScheme"
-                          me="10px"
-                          checked={
-                            data?.length &&
-                            data.every((item) =>
-                              props.selectedItems.includes(item.id)
+                        <MemoizedCheckbox
+                          checked={data.every((item) =>
+                            selectedItems.includes(item.id)
+                          )}
+                          onChange={(e) =>
+                            handleSelect(
+                              e,
+                              data.map((item) => item.id)
                             )
                           }
-                          onChange={(e) => {
-                            const allIds = data.map((item) => item.id);
-                            props.handleMultipleSelect(e, allIds);
-                            console.log(sorting);
-                          }}
                         />
                       )}
                       <div
@@ -241,41 +360,34 @@ function DefaultTable(props) {
           </tbody>
         </table>
       </div>
-      <TablePagination
-        component="div"
-        count={tableData?.page?.totalElements}
-        page={tableData?.page?.number}
-        onPageChange={(e, page) => props.handlePageChange(page)}
-        rowsPerPage={tableData?.page?.size}
-        rowsPerPageOptions={rowsPerPage(tableData?.page?.totalElements)}
-        onRowsPerPageChange={(e) =>
-          props.handleOnRowsPerPageChange(parseInt(e.target.value, 10))
-        }
-        sx={{
-          fontWeight: "bold",
-          color: "black",
-          "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows":
-            {
-              fontWeight: "bold",
-            },
-          "& .MuiSelect-select": {
-            fontWeight: "bold",
-          },
-          "& .MuiIconButton-root": {
-            color: "black",
-            transition: "color 0.2s ease-in-out",
-            "&:hover": {
-              color: "#555",
-            },
-            "&:disabled": {
-              color: "#ccc",
-            },
-          },
-        }}
-        className="dark:text-white dark:[&_.MuiIconButton-root:hover]:text-gray-400 dark:[&_.MuiIconButton-root]:text-white"
-      />
+      <div className="mt-4 flex items-center justify-between border-t px-4 py-3">
+        <div className="flex items-center space-x-4 text-sm text-gray-400 dark:text-white">
+          <span>
+            {t("page")} {table.getState().pagination.pageIndex + 1} /{" "}
+            {table.getPageCount()}
+          </span>
+          <select
+            className="flex h-9 rounded-xl border border-gray-200 bg-white px-3 text-sm outline-none focus:border-brand-500 dark:border-white/10 dark:bg-navy-900 dark:text-white dark:focus:border-brand-400"
+            value={table.getState().pagination.pageSize}
+            onChange={(e) => table.setPageSize(Number(e.target.value))}
+          >
+            {getPageOptions().map((size) => (
+              <option key={size} value={size}>
+                {size}
+              </option>
+            ))}
+          </select>
+        </div>
+        <Pagination />
+      </div>
     </Card>
   );
-}
+},(prevProps,newProps) => 
+prevProps.tableData === newProps.tableData && 
+prevProps.columnsData === newProps.columnsData &&
+prevProps.selectedItems === newProps.selectedItems && 
+prevProps.handleSelect === newProps.handleSelect &&
+prevProps.onPageChange === newProps.onPageChange
+)
 
 export default DefaultTable;

@@ -1,64 +1,64 @@
 import { Dialog } from "@headlessui/react";
 import InputField from "../../../../../components/fields/InputField";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useFormik } from "formik";
 import { MediaService } from "../../../../../service/MediaService";
-import {FaEye, FaTrash} from "react-icons/fa";
-import { toast } from "react-toastify";
+import { FaEye, FaTrash } from "react-icons/fa";
 import { useDisclosure } from "@chakra-ui/hooks";
+import { useTranslation } from "react-i18next";
+import { useToast } from "../../../../../utils/toast/toast";
 
-const MediaSourceDialog = (props) => {
+const MediaSourceDialog = ({ data }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { data } = props;
-  const service = new MediaService();
+  const service = useMemo(() => new MediaService(), [])
   const [mediaSources, setMediaSources] = useState([]);
+  const { t } = useTranslation();
+  const toast = useToast();
 
   const formik = useFormik({
-    initialValues: { mediaSources: mediaSources },
-    enableReinitialize: true,
+    initialValues: {mediaSources:[]},
+    validateOnChange: false,
+    validateOnBlur: false,
+    validateOnMounted: false,
     onSubmit: (values) => {
-      console.log(values);
       updateMediaSources(values);
     },
   });
 
-  useEffect(() => {
-    if (data && isOpen) {
-      getMediaSources(data);
-    }
-  }, [data, isOpen]);
+  const catchError = useCallback((err) => {
+    toast.error(err.message);
+  },[toast]);
 
-  const getMediaSources = (id) => {
+  const getMediaSources = useCallback(() => {
     service
-      .getMediaSourcesByMediaId(id)
+      .getMediaSourcesByMediaId(data)
       .then((response) => {
         if (response.status === 200) {
           setMediaSources(response.data);
         }
       })
       .catch((err) => {
-        throw err;
+        catchError(err);
       });
-  };
+  },[catchError,data,service]);
+
+  useEffect(() => {
+    getMediaSources();
+  },[getMediaSources]);
+
 
   const updateMediaSources = (request) => {
     service
       .updateMediaSources(data, request)
       .then((response) => {
         if (response.status === 204) {
-          toast.success("UPDATE SUCCESS", {
-            position: "top-center",
-            autoClose: 3000,
+          toast.success(t("success"), {
             onClose: onClose,
           });
         }
       })
       .catch((err) => {
-        toast.error("SOMETHINGS WENT WRONG", {
-          position: "top-center",
-          autoClose: 3000,
-          data: err.status,
-        });
+        catchError(err);
         setMediaSources([]);
       });
   };
@@ -71,6 +71,11 @@ const MediaSourceDialog = (props) => {
     { display: "OK.RU", value: "OK_RU" },
   ];
 
+  const handleSubmitFormik = () => {
+    formik.setFieldValue("mediaSources",mediaSources);
+    formik.handleSubmit();
+  }
+
   const handleAddMediaSource = () => {
     const newMedia = {
       url: "",
@@ -78,7 +83,6 @@ const MediaSourceDialog = (props) => {
       fanSub: "",
       mediaId: data,
     };
-
     setMediaSources((prev) => [...prev, newMedia]);
   };
 
@@ -93,112 +97,110 @@ const MediaSourceDialog = (props) => {
   };
 
   return (
-      <div>
-        <button
-            className="flex cursor-pointer items-center justify-center rounded-lg bg-gray-300 p-2 text-white hover:bg-gray-400"
-            onClick={onOpen}
-            aria-label="Kaynak"
-        >
-          <FaEye size={24} />
-        </button>
-        <Dialog
-            open={isOpen}
-            onClose={onClose}
-            className="fixed inset-0 z-10 overflow-y-auto"
-        >
-          <div className="flex min-h-screen items-center justify-center">
-            <Dialog.Panel className="z-20 h-full max-h-[100vh] w-full max-w-6xl overflow-y-auto rounded-lg border border-gray-300 bg-white p-6 shadow-lg">
-              <Dialog.Title
-                  as="h3"
-                  className="mb-4 text-lg font-medium leading-6 text-gray-900"
-              >
-                {"Kaynak"}
-              </Dialog.Title>
-              {mediaSources.map((mediaSource, index) => (
-                  <div key={index} className="mb-4 flex flex-row space-x-2">
-                    <div className="flex-[1]">
-                      <label className="ml-3 text-sm font-bold text-navy-700 dark:text-white">
-                        {"Type"}
-                      </label>
-                      <select
-                          className="mt-2 flex h-12 w-full rounded-xl border border-gray-200 bg-white p-3 text-sm outline-none focus:border-blue-500 dark:border-white/10 dark:text-white dark:focus:border-blue-400"
-                          value={mediaSource.type}
-                          onChange={(e) =>
-                              handleUpdateMediaSource(index, "type", e.target.value)
-                          }
+    <div>
+      <button
+        className="flex cursor-pointer items-center justify-center rounded-lg bg-gray-300 p-2 text-white hover:bg-gray-400"
+        onClick={onOpen}
+        aria-label={t("source")}
+      >
+        <FaEye size={24} />
+      </button>
+      <Dialog
+        open={isOpen}
+        onClose={onClose}
+        className="fixed inset-0 z-10 overflow-y-auto"
+      >
+        <div className="flex min-h-screen items-center justify-center">
+          <Dialog.Panel className="z-20 h-full max-h-[100vh] w-full max-w-6xl overflow-y-auto rounded-lg border border-gray-300 bg-white p-6 shadow-lg dark:border-brand-400 dark:!bg-navy-900">
+            <Dialog.Title
+              as="h3"
+              className="mb-4 text-lg font-medium leading-6 text-gray-900 dark:text-white"
+            >
+              {t("source")}
+            </Dialog.Title>
+            {mediaSources.map((mediaSource, index) => (
+              <div key={index} className="mb-4 flex flex-row space-x-2">
+                <div className="flex-[1]">
+                  <label className="ml-3 text-sm font-bold text-navy-700 dark:text-white">
+                    {t("type")}
+                  </label>
+                  <select
+                    className="mt-2 flex h-12 w-full rounded-xl border border-gray-200 bg-white p-3 text-sm outline-none focus:border-blue-500 dark:border-white/10 dark:bg-navy-900 dark:text-white dark:focus:border-blue-400"
+                    value={mediaSource.type}
+                    onChange={(e) =>
+                      handleUpdateMediaSource(index, "type", e.target.value)
+                    }
+                  >
+                    {options.map((option) => (
+                      <option
+                        key={option.value}
+                        value={option.value}
+                        className="text-black dark:text-white"
                       >
-                        {options.map((option) => (
-                            <option
-                                key={option.value}
-                                value={option.value}
-                                className="text-black dark:text-white"
-                            >
-                              {option.display}
-                            </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="flex-[2]">
-                      <InputField
-                          label="Url"
-                          placeholder="url"
-                          type="text"
-                          value={mediaSource.url}
-                          onChange={(e) =>
-                              handleUpdateMediaSource(index, "url", e.target.value)
-                          }
-                      />
-                    </div>
-                    <div className="flex-[1]">
-                      <InputField
-                          label="FanSub"
-                          placeholder="fanSub"
-                          type="text"
-                          value={mediaSource.fanSub}
-                          onChange={(e) =>
-                              handleUpdateMediaSource(index, "fanSub", e.target.value)
-                          }
-                      />
-                    </div>
-                    <button
-                        type="button"
-                        className="cursor-pointer rounded-lg bg-red-500 p-2 text-white hover:bg-red-600"
-                        onClick={() => handleRemoveMediaSource(index)}
-                    >
-                      <FaTrash size={24} />
-                    </button>
-                  </div>
-              ))}
-              <button
+                        {option.display}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex-[2]">
+                  <InputField
+                    label="URL"
+                    placeholder="URL"
+                    type="text"
+                    value={mediaSource.url}
+                    onChange={(e) =>
+                      handleUpdateMediaSource(index, "url", e.target.value)
+                    }
+                  />
+                </div>
+                <div className="flex-[1]">
+                  <InputField
+                    label="FanSub"
+                    placeholder="fanSub"
+                    type="text"
+                    value={mediaSource.fanSub}
+                    onChange={(e) =>
+                      handleUpdateMediaSource(index, "fanSub", e.target.value)
+                    }
+                  />
+                </div>
+                <button
                   type="button"
-                  className="w-full cursor-pointer rounded-md bg-green-500 px-4 py-2 font-bold text-white"
-                  onClick={handleAddMediaSource}
-              >
-                Add
-              </button>
-              <div className="mt-4 flex justify-end">
-                <button
-                    type="button"
-                    onClick={onClose}
-                    className="mr-2 cursor-pointer rounded-md bg-red-500 px-4 py-2 font-bold text-white"
+                  className="cursor-pointer rounded-lg bg-red-500 p-2 text-white hover:bg-red-600"
+                  onClick={() => handleRemoveMediaSource(index)}
                 >
-                  Close
-                </button>
-                <button
-                    type="button"
-                    className="cursor-pointer rounded-md bg-green-500 px-4 py-2 font-bold text-white"
-                    onClick={() => {
-                      formik.handleSubmit();
-                      onClose();
-                    }}
-                >
-                  Save
+                  <FaTrash size={24} />
                 </button>
               </div>
-            </Dialog.Panel>
-          </div>
-        </Dialog>
-      </div>
+            ))}
+            <button
+              type="button"
+              className="w-full cursor-pointer rounded-md bg-green-500 px-4 py-2 font-bold text-white"
+              onClick={handleAddMediaSource}
+            >
+              {t("add")}
+            </button>
+            <div className="mt-4 flex justify-end">
+              <button
+                type="button"
+                onClick={onClose}
+                className="mr-2 cursor-pointer rounded-md bg-red-500 px-4 py-2 font-bold text-white"
+              >
+                {t("close")}
+              </button>
+              <button
+                type="button"
+                className="cursor-pointer rounded-md bg-green-500 px-4 py-2 font-bold text-white"
+                onClick={handleSubmitFormik}
+              >
+                {t("save")}
+              </button>
+            </div>
+          </Dialog.Panel>
+        </div>
+      </Dialog>
+    </div>
   );
-};
+}
+
 export default MediaSourceDialog;

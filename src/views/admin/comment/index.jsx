@@ -1,12 +1,11 @@
 import DefaultTable from "../../../components/table/CheckTable";
-import React, { useEffect, useState } from "react";
+import React, {useCallback, useEffect, useMemo, useState} from "react";
 import { commentColumnsData } from "../../../components/table/columnsData";
 import { CommentService } from "../../../service/CommentService";
-import { FaEdit, FaIdCard, FaPlus, FaTrash } from "react-icons/fa";
+import { FaEdit, FaIdCard, FaTrash } from "react-icons/fa";
 import UserBanner from "./components/user";
 import Reply from "./components/reply";
 import CommentDialog from "./components/dialog";
-import { FiSearch } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 import { useToast } from "../../../utils/toast/toast";
 import CustomModal from "../../../components/modal";
@@ -17,21 +16,34 @@ import {
   CommentUpdateValidationSchema,
 } from "../../../utils/validation/ValidationSchemas";
 
+import ActionButton from "../../../components/actionbutton";
+import Header from "../../../components/header";
+import SearchBox from "../../../components/searchbox";
+
 const Comment = (props) => {
-  const {targetId} = props;
+  const { targetId } = props;
+  const [items, setItems] = useState({
+    content: [],
+    page: {
+      number: null,
+      size: null,
+      totalElements: null,
+      totalPages: null,
+    },
+  });
   const [selectedItems, setSelectedItems] = useState([]);
-  const [items, setItems] = useState(undefined);
-  const service = new CommentService();
-  const [page, setPage] = useState(0);
-  const [size, setSize] = useState(10);
-  const [targetFilter, setTargetFilter] = useState("");
+  const service = useMemo(() => new CommentService(),[]);
   const { t } = useTranslation();
   const toast = useToast();
   const [validationSchema, setValidationSchema] = useState(
     CommentCreateValidationSchema
   );
   const [dialogVisible, setDialogVisible] = useState(false);
-  const [submitted,setSubmitted] = useState(false);
+  const [requestParams, setRequestParams] = useState({
+    page: 0,
+    size: 10,
+    target: null,
+  });
 
   const baseItem = {
     content: "",
@@ -43,69 +55,66 @@ const Comment = (props) => {
   const formik = useFormik({
     validationSchema: validationSchema,
     initialValues: baseItem,
+    validateOnMount: false,
+    validateOnBlur: false,
+    validateOnChange: false,
     onSubmit: (values) => {
       if (values.id) {
         updateItem(values);
       } else {
         createItem(values);
       }
-    }
+      setDialogVisible(false);
+    },
   });
 
-  useEffect(() => {
-    const params = {
-      page: page,
-      size: size,
-    };
-    if (targetFilter.length > 0) {
-      params.target = targetFilter;
-    }
-    getItems(params);
-  }, [page, size, targetFilter]);
+  const catchError = useCallback((error, options) => {
+    toast.error(error.message, options);
+  }, [toast]);
 
-  const getItems = (params) => {
+  const getItems = useCallback(() => {
     if (targetId) {
       service
-          .getAllByTarget(params,targetId)
+          .getAllByTarget(requestParams, targetId)
           .then((response) => {
             if (response.status === 200) {
               setItems(response.data);
             }
           })
           .catch((error) => {
-            catchError(error);
+            catchError(error,{});
           });
     } else {
       service
-          .getAll(params)
+          .getAll(requestParams)
           .then((response) => {
             if (response.status === 200) {
               setItems(response.data);
             }
           })
           .catch((error) => {
-            catchError(error);
+            catchError(error,{});
           });
     }
-  };
+  }, [requestParams, catchError, service,targetId]);
+
+  useEffect(() => {
+    getItems();
+  }, [getItems]);
 
   const createItem = (request) => {
     service
-        .create(request)
-        .then((response) => {
-          if (response.status === 201) {
-            toast.success(t("success"),{
-              onClose: () => getItems({
-                page: page,
-                size: size,
-              })
-            });
-            hideDialog();
-          }
-        })
-        .catch((error) => {
-          catchError(error);
-        });
+      .create(request)
+      .then((response) => {
+        if (response.status === 201) {
+          toast.success(t("success"), {
+            onClose: getItems
+          });
+        }
+      })
+      .catch((error) => {
+        catchError(error,{});
+      });
   };
 
   const updateItem = (request) => {
@@ -113,57 +122,46 @@ const Comment = (props) => {
       .update(request.id, request)
       .then((response) => {
         if (response.status === 204) {
-          toast.success(t("success"));
-        }
-      })
-      .catch((error) => {
-        catchError(error);
-      });
-  };
-
-  const handleDelete = (id) => {
-    service
-      .delete(id)
-      .then((response) => {
-        if (response.status === 204) {
-          toast.success(t("success"), {
-            onClose: () => getItems({
-              page: page,
-              size: size,
-            })
+          toast.success(t("success"),{
+            onClose: getItems
           });
-          hideDialog();
         }
       })
       .catch((error) => {
-        catchError(error);
+        catchError(error,{});
       });
   };
 
-  const catchError = (error) => {
-    toast.error(error.message);
-  };
-
-  const hideDialog = () => {
-    formik.resetForm();
-    setDialogVisible(false);
-    setSubmitted(false);
-  };
+  const deleteItem = (id) => {
+    service
+        .delete(id)
+        .then((response) => {
+          if (response.status === 204) {
+            toast.success(t("success"), {
+              onClose: getItems
+            });
+          }
+        })
+        .catch((error) => {
+          catchError(error,{});
+        });
+  }
 
   const handleSubmitFormik = () => {
     if (formik.values.type === "COMMENT") {
       formik.setFieldValue("parentId", null);
     }
     formik.handleSubmit();
-    setSubmitted(true);
   };
-
+  const hideDialog = () => {
+    formik.resetForm();
+    setDialogVisible(false);
+  };
   const handleCreate = () => {
     setValidationSchema(CommentCreateValidationSchema);
     formik.setValues(baseItem);
     setDialogVisible(true);
   };
-
   const handleUpdate = (data) => {
     setValidationSchema(CommentUpdateValidationSchema);
     formik.setValues({
@@ -172,89 +170,68 @@ const Comment = (props) => {
     });
     setDialogVisible(true);
   };
-
-  const handleSelect = (e, id) => {
-    if (e.target.checked) {
-      setSelectedItems([...selectedItems, id]);
-    } else {
-      setSelectedItems(selectedItems.filter((item) => item !== id));
-    }
+  const handleDelete = (id) => {
+    deleteItem(id);
   };
 
-  const handleMultipleSelect = (e, targets) => {
+  const handleSelect = useCallback((e, items) => {
     if (e.target.checked) {
-      setSelectedItems((prev) => [...new Set([...prev, ...targets])]);
+      setSelectedItems((prev) =>
+          Array.isArray(items)
+              ? [...new Set([...prev, ...items])]
+              : [...prev, items]
+      );
     } else {
       setSelectedItems((prev) =>
-        prev.filter((item) => !targets.includes(item))
+          Array.isArray(items)
+              ? prev.filter((item) => !items.includes(item))
+              : prev.filter((item) => item !== items)
       );
     }
-  };
+  }, []);
 
-  const handlePageChange = (page) => {
+  const onPageChange = useCallback((page, size) => {
+    setRequestParams((prev) => ({ ...prev, page: page, size: size }));
     setSelectedItems([]);
-    setPage(page);
-  };
+  }, []);
 
-  const handleOnRowsPerPageChange = (size) => {
-    setSelectedItems([]);
-    setSize(size);
-  };
+  const searchKeyDown = useCallback((e) => {
+    setRequestParams((prevState) => ({ ...prevState, page: 0 }));
 
-  const header = () => {
-    return (
-      <div className="flex w-full flex-row items-center justify-between">
-        {props.header ? props.header : (
-            <div className="flex items-center justify-between space-x-4 py-4">
-              <button
-                  className="flex flex-col items-center gap-2 rounded-xl bg-green-500 px-5 py-3 text-base font-bold text-white transition duration-200 hover:bg-green-600 active:bg-green-700 dark:bg-green-400 dark:text-white dark:hover:bg-green-300 dark:active:bg-green-200"
-                  onClick={() => handleCreate()}
-              >
-                <FaPlus />
-                {t("create")}
-              </button>
-              <button
-                  className={`flex flex-col items-center gap-2 rounded-xl px-5 py-3 text-base font-bold text-white transition duration-200 dark:text-white dark:hover:bg-red-300 dark:active:bg-red-200 
-                    ${
-                      selectedItems.length === 0
-                          ? "cursor-not-allowed bg-red-300"
-                          : "bg-red-500 hover:bg-red-600 active:bg-red-700 dark:bg-red-400"
-                  }`}
-                  onClick={() => {
-                    console.log(selectedItems);
-                  }}
-              >
-                <FaTrash />
-                {t("deleteBulk")}
-              </button>
-            </div>
-        )}
-        <div className="flex h-full items-center rounded-full bg-lightPrimary pb-4 pt-4 text-navy-700 dark:bg-navy-900 dark:text-white xl:w-[350px]">
-          <p className="pl-3 pr-2 text-xl">
-            <FiSearch className="h-4 w-4 text-gray-400 dark:text-white" />
-          </p>
-          <input
-            type="text"
-            placeholder="Search..."
-            className="block h-full w-full rounded-full bg-lightPrimary text-sm font-medium text-navy-700 outline-none placeholder:!text-gray-400 dark:bg-navy-900 dark:text-white dark:placeholder:!text-white"
-            onKeyDown={searchKeyDown}
-          />
-        </div>
-      </div>
-    );
-  };
-  const searchKeyDown = (e) => {
     if (e.key === "Enter") {
       const value = e.target.value.trim();
       if (value) {
-        setTargetFilter(value);
+        setRequestParams((prevState) => ({
+          ...prevState,
+          target: value,
+        }));
       } else {
-        setTargetFilter("");
+        setRequestParams((prevState) => ({ ...prevState, target: null }));
       }
     }
-  };
-  const actionButtons = (data) => {
-    return props.actionButtons ? props.actionButtons(data) : (
+  }, []);
+
+  const header = useCallback(() => {
+    return (
+        <div className="flex w-full flex-row items-center justify-between">
+          {props.header ? (
+              props.header()
+          ) : (
+              <Header
+                  onBulkDelete={() => console.log(selectedItems)}
+                  itemsLength={selectedItems.length}
+                  onCreate={handleCreate}
+              />
+          )}
+          <SearchBox onKeyDown={searchKeyDown} />
+        </div>
+    );
+  },[selectedItems,props.header]);
+
+  const actionButtons = useCallback((data) => {
+    return props.actionButtons ? (
+      props.actionButtons(data)
+    ) : (
       <div className="flex space-x-2">
         <CustomModal
           title={"ID"}
@@ -264,25 +241,23 @@ const Comment = (props) => {
           }
           buttonText={<FaIdCard size={24} />}
         />
-        <button
-          className="flex cursor-pointer items-center justify-center rounded-lg bg-blue-500 p-2 text-white hover:bg-blue-600"
-          onClick={() => handleUpdate(data)}
-          aria-label={t("update")}
-        >
-          <FaEdit size={24} />
-        </button>
-        <button
-          className="flex cursor-pointer items-center justify-center rounded-lg bg-red-500 p-2 text-white hover:bg-red-600"
-          onClick={() => handleDelete(data.id)}
-          aria-label={t("delete")}
-        >
-          <FaTrash size={24} />
-        </button>
+        <ActionButton
+            onClick={() => handleUpdate(data)}
+            icon={<FaEdit size={24} />}
+            color={"blue"}
+            label={t("update")}
+        />
+        <ActionButton
+            onClick={() => handleDelete(data.id)}
+            icon={<FaTrash size={24} />}
+            color={"red"}
+            label={t("delete")}
+        />
       </div>
     );
-  };
+  },[props.actionButtons]);
 
-  const modalComponent = (data, accessor) => {
+  const modalComponent = useCallback((data, accessor) => {
     switch (accessor) {
       case "content":
         return (
@@ -299,16 +274,16 @@ const Comment = (props) => {
       default:
         return <></>;
     }
-  };
+  },[]);
 
   return (
     <>
       <CommentDialog
-          formik={formik}
-          dialogVisible={dialogVisible}
-          hideDialog={hideDialog}
-          submitted={submitted}
-          handleSubmitFormik={handleSubmitFormik}/>
+        formik={formik}
+        dialogVisible={dialogVisible}
+        hideDialog={hideDialog}
+        handleSubmitFormik={handleSubmitFormik}
+      />
       <DefaultTable
         header={header}
         columnsData={commentColumnsData}
@@ -316,9 +291,7 @@ const Comment = (props) => {
         selectedItems={selectedItems}
         actionButtons={actionButtons}
         handleSelect={handleSelect}
-        handleMultipleSelect={handleMultipleSelect}
-        handlePageChange={handlePageChange}
-        handleOnRowsPerPageChange={handleOnRowsPerPageChange}
+        onPageChange={onPageChange}
         modalComponent={modalComponent}
       />
     </>

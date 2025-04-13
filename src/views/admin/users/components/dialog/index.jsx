@@ -5,7 +5,7 @@ import InputField from "../../../../../components/fields/InputField";
 import {useTranslation} from "react-i18next";
 
 const UserDialog = (props) => {
-  const {formik,dialogVisible,hideDialog,submitted,handleSubmitFormik} = props;
+  const {formik,dialogVisible,hideDialog,handleSubmitFormik} = props;
   const {t} = useTranslation();
 
   return (
@@ -15,10 +15,10 @@ const UserDialog = (props) => {
       className="fixed inset-0 z-10 overflow-y-auto"
     >
       <div className="flex min-h-screen items-center justify-center">
-        <Dialog.Panel className="z-20 h-full max-h-[80vh]  w-full max-w-lg overflow-y-auto rounded-lg border border-gray-300 bg-white p-6 shadow-lg">
+        <Dialog.Panel className="z-20 h-full max-h-[80vh]  w-full max-w-lg overflow-y-auto rounded-lg border border-gray-300 bg-white p-6 shadow-lg dark:!bg-navy-900 dark:border-brand-400">
           <Dialog.Title
             as="h3"
-            className="mb-4 text-lg font-medium leading-6 text-gray-900"
+            className="mb-4 text-lg font-medium leading-6 text-gray-900 dark:text-white"
           >
             {formik.values?.id ? t("update") : t("save")}
           </Dialog.Title>
@@ -28,11 +28,11 @@ const UserDialog = (props) => {
                 placeholder={t("firstName")}
                 name="firstName"
                 type="text"
-                state={formik.errors?.firstName && submitted && "error"}
+                state={formik.errors?.firstName &&  "error"}
                 value={formik.values?.firstName}
                 onChange={formik.handleChange}
             />
-            {formik.errors.firstName && submitted && (
+            {formik.errors.firstName &&  (
               <div className="text-red-500">{formik.errors.firstName}</div>
             )}
           </div>
@@ -42,11 +42,11 @@ const UserDialog = (props) => {
                 placeholder={t("lastName")}
                 name="lastName"
                 type="text"
-                state={formik.errors?.lastName && submitted && "error"}
+                state={formik.errors?.lastName &&  "error"}
                 value={formik.values?.lastName}
                 onChange={formik.handleChange}
             />
-            {formik.errors.lastName && submitted && (
+            {formik.errors.lastName &&  (
               <div className="text-red-500">{formik.errors.lastName}</div>
             )}
           </div>
@@ -56,11 +56,11 @@ const UserDialog = (props) => {
                 placeholder={t("email")}
                 name="email"
                 type="email"
-                state={formik.errors?.email && submitted && "error"}
+                state={formik.errors?.email &&  "error"}
                 value={formik.values?.email}
                 onChange={formik.handleChange}
             />
-            {formik.errors.email && submitted && (
+            {formik.errors.email &&  (
               <div className="text-red-500">{formik.errors.email}</div>
             )}
           </div>
@@ -72,11 +72,11 @@ const UserDialog = (props) => {
                     placeholder={t("username")}
                     name="username"
                     type="text"
-                    state={formik.errors?.username && submitted && "error"}
+                    state={formik.errors?.username &&  "error"}
                     value={formik.values?.username}
                     onChange={formik.handleChange}
                 />
-                {formik.errors.username && submitted && (
+                {formik.errors.username &&  (
                   <div className="text-red-500">{formik.errors.username}</div>
                 )}
               </div>
@@ -86,11 +86,11 @@ const UserDialog = (props) => {
                     placeholder={t("password")}
                     name="password"
                     type="password"
-                    state={formik.errors?.password && submitted && "error"}
+                    state={formik.errors?.password &&  "error"}
                     value={formik.values?.password}
                     onChange={formik.handleChange}
                 />
-                {formik.errors.password && submitted && (
+                {formik.errors.password &&  (
                   <div className="text-red-500">{formik.errors.password}</div>
                 )}
               </div>
@@ -100,11 +100,11 @@ const UserDialog = (props) => {
                     placeholder={t("passwordAgain")}
                     name="passwordRe"
                     type="password"
-                    state={formik.errors?.passwordRe && submitted && "error"}
+                    state={formik.errors?.passwordRe &&  "error"}
                     value={formik.values?.passwordRe}
                     onChange={formik.handleChange}
                 />
-                {formik.errors.passwordRe && submitted && (
+                {formik.errors.passwordRe &&  (
                     <div className="text-red-500">{formik.errors.passwordRe}</div>
                 )}
               </div>
@@ -146,11 +146,11 @@ const UserDialog = (props) => {
                 placeholder={t("birthdate")}
                 name="birthdate"
                 type="date"
-                state={formik.errors?.birthdate && submitted && "error"}
+                state={formik.errors?.birthdate &&  "error"}
                 value={formik.values?.birthdate}
                 onChange={formik.handleChange}
             />
-            {formik.errors.birthdate  && submitted && (
+            {formik.errors.birthdate  &&  (
                 <div className="text-red-500">{formik.errors.birthdate}</div>
             )}
           </div>

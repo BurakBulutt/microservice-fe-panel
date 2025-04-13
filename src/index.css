@@ -27,3 +27,12 @@ input.defaultCheckbox::before {
 input:checked.defaultCheckbox::before { 
 	opacity: 1;
 }
+
+.editor-wrapper iframe,
+.editor-wrapper div[contenteditable] {
+	resize: none !important;
+	overflow-y: auto !important;
+	overflow-x: hidden !important;
+	white-space: pre-wrap !important;
+	word-break: break-word !important;
+}

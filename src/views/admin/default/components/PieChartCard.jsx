@@ -4,7 +4,7 @@ import Card from "components/card";
 
 const PieChartCard = () => {
   return (
-    <Card extra="rounded-[20px] p-2">
+    <Card extra="rounded-[20px] pt-3 pr-3 pl-3">
       <div className="flex flex-row justify-between px-3 pt-2">
         <div>
           <h4 className="text-lg font-bold text-navy-700 dark:text-white">

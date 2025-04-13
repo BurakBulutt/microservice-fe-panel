@@ -1,4 +1,5 @@
-import {toast} from "react-toastify";
+import { toast } from "react-toastify";
+import {useCallback, useMemo} from "react";
 
 const defaultOptions = {
   position: "top-center",
@@ -8,26 +9,31 @@ const defaultOptions = {
 };
 
 export const useToast = () => {
-  const success = (content, options = {}) => {
+  const success = useCallback((content, options = {}) => {
     toast.success(content, { ...defaultOptions, ...options });
-  };
+  }, []);
 
-  const error = (content, options = {}) => {
+  const error = useCallback((content, options = {}) => {
     toast.error(content, { ...defaultOptions, ...options });
-  };
+  }, []);
 
-  const info = (content, options = {}) => {
+  const info = useCallback((content, options = {}) => {
     toast.info(content, { ...defaultOptions, ...options });
-  };
+  }, []);
 
-  const warning = (content, options = {}) => {
+  const warn = useCallback((content, options = {}) => {
+    toast.warn(content, { ...defaultOptions, ...options });
+  }, []);
+
+  const warning = useCallback((content, options = {}) => {
     toast.warning(content, { ...defaultOptions, ...options });
-  };
+  }, []);
 
-  return {
+  return useMemo(() => ({
     success,
     error,
     info,
+    warn,
     warning,
-  };
+  }), [success, error, info, warn, warning]);
 };

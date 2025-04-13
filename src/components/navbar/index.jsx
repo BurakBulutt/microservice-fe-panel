@@ -33,8 +33,8 @@ const Navbar = (props) => {
   }, [locale]);
 
   const localeOptions = [
-    { code: "en", label: "English", icon: <span className="text-lg">🇺🇸</span> },
-    { code: "tr", label: "Turkish", icon: <span className="text-lg">🇹🇷</span> },
+    { code: "en", label: t("english"), icon: <span className="text-lg">🇺🇸</span> },
+    { code: "tr", label: t("turkish"), icon: <span className="text-lg">🇹🇷</span> },
   ];
 
   const getPath = (route, routes) => {
@@ -47,6 +47,8 @@ const Navbar = (props) => {
     }
     return route.path;
   };
+
+  const profileImageUrl = `https://api.dicebear.com/7.x/initials/svg?seed=${userProfile?.firstName?.charAt(0) + userProfile?.lastName?.charAt(0)}&&padding=20&fontSize=40`;
 
   return (
     <nav className="sticky top-4 z-40 flex flex-row flex-wrap items-center justify-between rounded-xl bg-white/10 p-2 backdrop-blur-xl dark:bg-[#0b14374d]">
@@ -120,7 +122,7 @@ const Navbar = (props) => {
             </div>
           }
           children={
-            <div className="flex w-40 flex-col justify-start rounded-[10px] bg-white p-2 shadow-lg dark:bg-navy-700">
+            <div className="flex w-40 flex-col justify-start rounded-[20px] bg-white p-2 shadow-lg dark:bg-navy-700">
               {localeOptions.map((option) => (
                 <button
                   key={option.code}
@@ -133,7 +135,7 @@ const Navbar = (props) => {
               ))}
             </div>
           }
-          classNames={"py-2 top-8 -left-[60px]"}
+          classNames={"py-2 top-12 -left-[120px]"}
         />
         <div
           className="cursor-pointer text-gray-600"
@@ -158,35 +160,33 @@ const Navbar = (props) => {
           button={
             <img
               className="h-10 w-10 rounded-full"
-              src={avatar}
-              alt="Elon Musk"
+              src={profileImageUrl}
+              alt={userProfile.firstName + " " + userProfile.lastName}
             />
           }
           children={
             <div className="flex w-56 flex-col justify-start rounded-[20px] bg-white bg-cover bg-no-repeat shadow-xl shadow-shadow-500 dark:!bg-navy-700 dark:text-white dark:shadow-none">
               <div className="flex flex-col items-center p-4">
                 <p className="text-sm font-bold text-navy-700 dark:text-white">
-                  👋 {t("hey")},{" "}
+                  👋 {" "}
                   {userProfile.firstName + " " + userProfile.lastName}
                 </p>
               </div>
 
               <div className="h-px w-full bg-gray-200 dark:bg-white/20 " />
 
-              <div className="flex flex-col items-center p-4">
+              <div className="cursor-pointer flex flex-col items-center p-4"
+                   onClick={() => keycloak.logout()}>
                 <a
                   href="#"
                   className="text-sm font-medium text-red-500 transition duration-150 ease-out hover:text-red-500 hover:ease-in"
-                  onClick={() => {
-                    keycloak.logout();
-                  }}
                 >
                   {t("logout")}
                 </a>
               </div>
             </div>
           }
-          classNames={"py-2 top-8 -left-[180px] w-max"}
+          classNames={"py-2 top-12 -left-[180px] w-max"}
         />
       </div>
     </nav>

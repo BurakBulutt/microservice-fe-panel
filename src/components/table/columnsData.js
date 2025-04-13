@@ -1,161 +1,190 @@
 export const usersColumnsData = [
   {
     accessor: "firstName",
-    type: "text"
+    type: "text",
+    priority: 0
   },
   {
     accessor: "lastName",
-    type: "text"
+    type: "text",
+    priority: 1
   },
   {
     accessor: "createdTimestamp",
-    type: "date"
+    type: "date",
+    priority: 2
   },
   {
     accessor: "username",
-    type: "text"
+    type: "text",
+    priority: 3
   },
   {
     accessor: "email",
-    type: "text"
+    type: "text",
+    priority: 4
   },
   {
     accessor: "emailVerified",
     type: "boolean",
     booleanTrue: "verified",
-    booleanFalse: "notVerified"
+    booleanFalse: "notVerified",
+    priority: 5
   },
   {
     accessor: "enabled",
     type: "boolean",
     booleanTrue: "active",
-    booleanFalse: "passive"
+    booleanFalse: "passive",
+    priority: 6
   }
 ];
 
 export const contentsColumnsData = [
   {
-    Header: "IMAGE",
+    header: "image",
     accessor: "photoUrl",
-    type: "image"
+    type: "image",
+    priority: 0
   },
   {
-    Header: "NAME",
     accessor: "name",
-    type: "text"
+    type: "text",
+    priority: 1
   },
   {
-    Header: "START DATE",
     accessor: "startDate",
-    type: "date"
+    type: "date",
+    priority: 2
   },
   {
-    Header: "SLUG",
     accessor: "slug",
-    type: "text"
+    type: "text",
+    priority: 3
   },
   {
-    Header: "CONTENT TYPE",
+    header: "category",
+    accessor: "categories",
+    type: "list",
+    listColor: "brand",
+    nameLabel: "name",
+    priority: 4
+  },
+  {
     accessor: "type",
-    type: "text"
+    type: "enum",
+    enumType: "contentType",
+    priority: 5
   },
   {
-    Header: "LIKE",
     accessor: "likeCount.likeCount",
-    type: "number"
+    type: "number",
+    priority: 6
   },
   {
-    Header: "DISLIKE",
     accessor: "likeCount.dislikeCount",
-    type: "number"
+    type: "number",
+    priority: 7
   },
 ];
 
 export const mediaColumnsData = [
   {
-    Header: "NAME",
     accessor: "name",
-    type: "text"
+    type: "text",
+    priority: 0
   },
   {
-    Header: "DESCRIPTION",
     accessor: "description",
-    type: "text"
+    type: "text",
+    priority: 1
   },
   {
-    Header: "COUNT",
+    header: "episodeNumber",
     accessor: "count",
-    type: "number"
+    type: "number",
+    priority: 2
   },
   {
-    Header: "PUBLISH DATE",
     accessor: "publishDate",
-    type: "date"
+    type: "date",
+    priority: 3
   },
   {
-    Header: "SLUG",
     accessor: "slug",
-    type: "text"
+    type: "text",
+    priority: 4
   },
   {
-    Header: "LIKE",
     accessor: "likeCount.likeCount",
-    type: "number"
+    type: "number",
+    priority: 5
   },
   {
-    Header: "DISLIKE",
     accessor: "likeCount.dislikeCount",
-    type: "number"
+    type: "number",
+    priority: 6
   },
   {
-    Header: "VIEWS",
     accessor: "numberOfViews",
-    type: "number"
+    type: "number",
+    priority: 7
   }
 ];
 
 export const commentColumnsData = [
   {
     accessor: "type",
-    type: "text"
+    type: "text",
+    priority: 0
   },
   {
     accessor: "content",
-    type: "modal"
+    type: "modal",
+    priority: 1
   },
   {
     accessor: "user",
-    type: "modal"
+    type: "modal",
+    priority: 2
   },
   {
     accessor: "parent",
-    type: "modal"
+    type: "modal",
+    priority: 3
   },
   {
+    header: "replyList",
     accessor: "commentList",
-    type: "modal"
+    type: "modal",
+    priority: 4
   },
   {
     accessor: "likeCount.likeCount",
-    type: "number"
+    type: "number",
+    priority: 5
   },
   {
     accessor: "likeCount.dislikeCount",
-    type: "number"
+    type: "number",
+    priority: 6
   }
 ];
 
 export const categoryColumnsData = [
   {
     accessor: "name",
-    type: "text"
+    type: "text",
+    priority: 0
   },
   {
     accessor: "description",
-    type: "text"
+    type: "text",
+    priority: 1
   },
   {
     accessor: "slug",
-    type: "text"
+    type: "text",
+    priority: 2
   }
 ];

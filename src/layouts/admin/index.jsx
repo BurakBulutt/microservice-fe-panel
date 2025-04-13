@@ -22,7 +22,6 @@ export default function Admin(props) {
 
   React.useEffect(() => {
     setCurrentRoute(getActiveRoute(routeList));
-    //setBreadCrumb(getBreadCrumb2(routeList));
   }, [location.pathname]);
 
   React.useEffect(() => {
