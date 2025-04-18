@@ -75,7 +75,7 @@ const CommentDialog = (props) => {
       case "MEDIA": return <Media metaComponent={false} header={() => header("target")} actionButtons={(data) => actionButtons(data,"target")} />
       default: return <></>;
     }
-  },[targetComponent,actionButtons,header]);
+  },[targetComponent,header,actionButtons]);
 
 
   const onSave = (formikLabel,key) => {

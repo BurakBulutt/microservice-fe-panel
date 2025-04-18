@@ -1,4 +1,4 @@
-import DefaultTable from "../../../components/table/CheckTable";
+import DefaultTable from "../../../components/table/DefaultTable";
 import React, {useCallback, useEffect, useMemo, useState} from "react";
 import { commentColumnsData } from "../../../components/table/columnsData";
 import { CommentService } from "../../../service/CommentService";
@@ -24,12 +24,7 @@ const Comment = (props) => {
   const { targetId } = props;
   const [items, setItems] = useState({
     content: [],
-    page: {
-      number: null,
-      size: null,
-      totalElements: null,
-      totalPages: null,
-    },
+    page: null,
   });
   const [selectedItems, setSelectedItems] = useState([]);
   const service = useMemo(() => new CommentService(),[]);
@@ -191,8 +186,12 @@ const Comment = (props) => {
   }, []);
 
   const onPageChange = useCallback((page, size) => {
-    setRequestParams((prev) => ({ ...prev, page: page, size: size }));
-    setSelectedItems([]);
+    setRequestParams((prev) => {
+      if (prev.page === page && prev.size === size) return prev;
+
+      setSelectedItems([]);
+      return { ...prev, page, size };
+    });
   }, []);
 
   const searchKeyDown = useCallback((e) => {
@@ -276,7 +275,7 @@ const Comment = (props) => {
     }
   },[]);
 
-  return (
+  return items.page && (
     <>
       <CommentDialog
         formik={formik}

@@ -14,7 +14,7 @@ import {
   UserCreateValidationSchema,
   UserUpdateValidationSchema,
 } from "../../../utils/validation/ValidationSchemas";
-import DefaultTable from "../../../components/table/CheckTable";
+import DefaultTable from "../../../components/table/DefaultTable";
 import CustomModal from "../../../components/modal";
 import IdCard from "../../../components/idcard";
 import { useTranslation } from "react-i18next";
@@ -26,12 +26,7 @@ import ActionButton from "../../../components/actionbutton";
 const Users = (props) => {
   const [items, setItems] = useState({
     content: [],
-    page: {
-      number: null,
-      size: null,
-      totalElements: null,
-      totalPages: null,
-    },
+    page: null,
   });
   const [selectedItems, setSelectedItems] = useState([]);
   const [dialogVisible, setDialogVisible] = useState(false);
@@ -82,7 +77,7 @@ const Users = (props) => {
 
   const getItems = useCallback(() => {
     service
-      .getAllUsers(requestParams)
+      .filter(requestParams)
       .then((response) => {
         if (response.status === 200) {
           setItems(response.data);
@@ -219,25 +214,26 @@ const Users = (props) => {
   }, []);
 
   const onPageChange = useCallback((page, size) => {
-    setRequestParams((prev) => ({ ...prev, page: page, size: size }));
-    setSelectedItems([]);
+    setRequestParams((prev) => {
+      if (prev.page === page && prev.size === size) return prev;
+
+      setSelectedItems([]);
+      return { ...prev, page, size };
+    });
   }, []);
 
   const searchKeyDown = useCallback((e) => {
-    setRequestParams((prevState) => ({ ...prevState, page: 0 }));
-
     if (e.key === "Enter") {
       const value = e.target.value.trim();
-      if (value) {
-        setRequestParams((prevState) => ({
-          ...prevState,
-          username: value,
-        }));
-      } else {
-        setRequestParams((prevState) => ({ ...prevState, username: null }));
-      }
+
+      setRequestParams((prevState) => ({
+        ...prevState,
+        page: 0,
+        username: value ? value : null,
+      }));
     }
   }, []);
+
 
   const header = useCallback(() => {
     return (
@@ -295,7 +291,7 @@ const Users = (props) => {
     );
   },[props.actionButtons]);
 
-  return (
+  return items.page && (
     <div>
       <UserDialog
         formik={formik}

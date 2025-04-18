@@ -1,4 +1,4 @@
-import DefaultTable from "../../../components/table/CheckTable";
+import DefaultTable from "../../../components/table/DefaultTable";
 import { categoryColumnsData } from "../../../components/table/columnsData";
 import React, {useCallback, useEffect, useMemo, useState} from "react";
 import {FaEdit, FaIdCard, FaTrash} from "react-icons/fa";
@@ -18,12 +18,7 @@ import ActionButton from "../../../components/actionbutton";
 const Category = (props) => {
   const [items, setItems] = useState({
     content: [],
-    page: {
-      number: null,
-      size: null,
-      totalElements: null,
-      totalPages: null,
-    },
+    page: null
   });
   const [selectedItems, setSelectedItems] = useState([]);
   const [dialogVisible, setDialogVisible] = useState(false);
@@ -62,7 +57,7 @@ const Category = (props) => {
 
   const getItems = useCallback(() => {
     service
-        .getAll(requestParams)
+        .filter(requestParams)
         .then((response) => {
           if (response.status === 200) {
             setItems(response.data);
@@ -114,7 +109,6 @@ const Category = (props) => {
     getItems();
   }, [getItems]);
 
-
   const handleSubmitFormik = () => {
     formik.handleSubmit();
   }
@@ -153,23 +147,24 @@ const Category = (props) => {
   }, []);
 
   const onPageChange = useCallback((page, size) => {
-    setRequestParams((prev) => ({ ...prev, page: page, size: size }));
-    setSelectedItems([]);
+    setRequestParams((prev) => {
+      if (prev.page === page && prev.size === size) return prev;
+
+      setSelectedItems([]);
+      return { ...prev, page, size };
+    });
   }, []);
 
-  const searchKeyDown = useCallback((e) => {
-    setRequestParams((prevState) => ({ ...prevState, page: 0 }));
 
+  const searchKeyDown = useCallback((e) => {
     if (e.key === "Enter") {
       const value = e.target.value.trim();
-      if (value) {
-        setRequestParams((prevState) => ({
-          ...prevState,
-          name: value,
-        }));
-      } else {
-        setRequestParams((prevState) => ({ ...prevState, name: null }));
-      }
+
+      setRequestParams((prevState) => ({
+        ...prevState,
+        page: 0,
+        username: value ? value : null,
+      }));
     }
   }, []);
 
@@ -216,7 +211,7 @@ const Category = (props) => {
     );
   },[props.actionButtons]);
 
-  return (
+  return items.page && (
     <div>
       <CategoryDialog
         formik={formik}

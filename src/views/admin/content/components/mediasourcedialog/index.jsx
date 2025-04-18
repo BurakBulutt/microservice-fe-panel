@@ -31,7 +31,7 @@ const MediaSourceDialog = ({ data }) => {
 
   const getMediaSources = useCallback(() => {
     service
-      .getMediaSourcesByMediaId(data)
+      .getMediaSources(data)
       .then((response) => {
         if (response.status === 200) {
           setMediaSources(response.data);
@@ -52,9 +52,8 @@ const MediaSourceDialog = ({ data }) => {
       .updateMediaSources(data, request)
       .then((response) => {
         if (response.status === 204) {
-          toast.success(t("success"), {
-            onClose: onClose,
-          });
+          toast.success(t("success"));
+          onClose();
         }
       })
       .catch((err) => {

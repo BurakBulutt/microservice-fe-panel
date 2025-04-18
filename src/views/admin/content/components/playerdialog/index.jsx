@@ -50,7 +50,7 @@ const PlayerDialog = (props) => {
 
   const getMediaSources = (id) => {
     service
-        .getMediaSourcesByMediaId(id)
+        .getMediaSources(id)
         .then((response) => {
           if (response.status === 200) {
             const mediaData = response.data;

@@ -1,5 +1,5 @@
 import { mediaColumnsData } from "../../../../../components/table/columnsData";
-import React, {useCallback, useEffect, useMemo, useState} from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { FaEdit, FaIdCard, FaTrash } from "react-icons/fa";
 import { useFormik } from "formik";
 import { MediaValidationSchema } from "../../../../../utils/validation/ValidationSchemas";
@@ -7,7 +7,7 @@ import { MediaService } from "../../../../../service/MediaService";
 import MediaDialog from "../mediadialog";
 import MediaSourceDialog from "../mediasourcedialog";
 import PlayerDialog from "../playerdialog";
-import DefaultTable from "../../../../../components/table/CheckTable";
+import DefaultTable from "../../../../../components/table/DefaultTable";
 import CustomModal from "../../../../../components/modal";
 import IdCard from "../../../../../components/idcard";
 import { useToast } from "../../../../../utils/toast/toast";
@@ -18,15 +18,10 @@ import SearchBox from "../../../../../components/searchbox";
 import ActionButton from "../../../../../components/actionbutton";
 
 const Media = (props) => {
-  const { contentId, metaComponent } = props;
+  const { contentId } = props;
   const [items, setItems] = useState({
     content: [],
-    page: {
-      number: null,
-      size: null,
-      totalElements: null,
-      totalPages: null,
-    },
+    page: null,
   });
   const [selectedItems, setSelectedItems] = useState([]);
   const [dialogVisible, setDialogVisible] = useState(false);
@@ -37,6 +32,7 @@ const Media = (props) => {
     page: 0,
     size: 10,
     name: null,
+    content: contentId,
   });
 
   const baseItem = {
@@ -63,37 +59,25 @@ const Media = (props) => {
     },
   });
 
-  const catchError = useCallback((error, options) => {
-    toast.error(error.message, options);
-  }, [toast]);
+  const catchError = useCallback(
+    (error, options) => {
+      toast.error(error.message, options);
+    },
+    [toast]
+  );
 
   const getItems = useCallback(() => {
-    if (contentId) {
-      service
-          .getByContentId(requestParams,contentId)
-          .then((response) => {
-            if (response.status === 200) {
-              setItems(response.data);
-            }
-          })
-          .catch((error) => {
-            catchError(error, {});
-          });
-    }else {
-      if(!metaComponent) {
-        service
-        .getAll(requestParams)
-        .then((response) => {
-          if (response.status === 200) {
-            setItems(response.data);
-          }
-        })
-        .catch((error) => {
-          catchError(error, {});
-        });
-      }
-    }
-  }, [requestParams, catchError, service,contentId,metaComponent]);
+    service
+      .filter(requestParams)
+      .then((response) => {
+        if (response.status === 200) {
+          setItems(response.data);
+        }
+      })
+      .catch((error) => {
+        catchError(error, {});
+      });
+  }, [requestParams, catchError, service, contentId]);
 
   const createItem = (request) => {
     service
@@ -101,7 +85,7 @@ const Media = (props) => {
       .then((response) => {
         if (response.status === 201) {
           toast.success(t("success"), {
-            onClose: getItems
+            onClose: getItems,
           });
           hideDialog();
         }
@@ -117,7 +101,7 @@ const Media = (props) => {
       .then((response) => {
         if (response.status === 204) {
           toast.success(t("success"), {
-            onClose: getItems
+            onClose: getItems,
           });
           hideDialog();
         }
@@ -133,7 +117,7 @@ const Media = (props) => {
       .then((response) => {
         if (response.status === 204) {
           toast.success(t("success"), {
-            onClose: getItems
+            onClose: getItems,
           });
           hideDialog();
         }
@@ -171,89 +155,92 @@ const Media = (props) => {
   const handleSelect = useCallback((e, items) => {
     if (e.target.checked) {
       setSelectedItems((prev) =>
-          Array.isArray(items)
-              ? [...new Set([...prev, ...items])]
-              : [...prev, items]
+        Array.isArray(items)
+          ? [...new Set([...prev, ...items])]
+          : [...prev, items]
       );
     } else {
       setSelectedItems((prev) =>
-          Array.isArray(items)
-              ? prev.filter((item) => !items.includes(item))
-              : prev.filter((item) => item !== items)
+        Array.isArray(items)
+          ? prev.filter((item) => !items.includes(item))
+          : prev.filter((item) => item !== items)
       );
     }
   }, []);
 
   const onPageChange = useCallback((page, size) => {
-    setRequestParams((prev) => ({ ...prev, page: page, size: size }));
-    setSelectedItems([]);
+    setRequestParams((prev) => {
+      if (prev.page === page && prev.size === size) return prev;
+
+      setSelectedItems([]);
+      return { ...prev, page, size };
+    });
   }, []);
 
   const searchKeyDown = useCallback((e) => {
-    setRequestParams((prevState) => ({ ...prevState, page: 0 }));
-
     if (e.key === "Enter") {
       const value = e.target.value.trim();
-      if (value) {
-        setRequestParams((prevState) => ({
-          ...prevState,
-          name: value,
-        }));
-      } else {
-        setRequestParams((prevState) => ({ ...prevState, name: null }));
-      }
+
+      setRequestParams((prevState) => ({
+        ...prevState,
+        page: 0,
+        username: value ? value : null,
+      }));
     }
   }, []);
 
   const header = useCallback(() => {
     return (
-        <div className="flex w-full flex-row items-center justify-between">
-          {props.header ? (
-              props.header()
-          ) : (
-              <Header
-                  onBulkDelete={() => console.log(selectedItems)}
-                  itemsLength={selectedItems.length}
-                  onCreate={handleCreate}
-              />
-          )}
-          <SearchBox onKeyDown={searchKeyDown} />
-        </div>
+      <div className="flex w-full flex-row items-center justify-between">
+        {props.header ? (
+          props.header()
+        ) : (
+          <Header
+            onBulkDelete={() => console.log(selectedItems)}
+            itemsLength={selectedItems.length}
+            onCreate={handleCreate}
+          />
+        )}
+        <SearchBox onKeyDown={searchKeyDown} />
+      </div>
     );
-  },[selectedItems,props.header]);
+  }, [selectedItems, props.header]);
 
-  const actionButtons = useCallback((data) => {
-    return props.actionButtons ? (
-      props.actionButtons(data)
-    ) : (
-      <div className="flex space-x-2">
-        <CustomModal
-          title={"ID"}
-          component={<IdCard id={data.id} />}
-          extra={
-            "flex cursor-pointer items-center justify-center rounded-lg bg-brand-500 p-2 text-white hover:bg-brand-600"
-          }
-          buttonText={<FaIdCard size={24} />}
-        />
-        <ActionButton
+  const actionButtons = useCallback(
+    (data) => {
+      return props.actionButtons ? (
+        props.actionButtons(data)
+      ) : (
+        <div className="flex space-x-2">
+          <CustomModal
+            title={"ID"}
+            component={<IdCard id={data.id} />}
+            extra={
+              "flex cursor-pointer items-center justify-center rounded-lg bg-brand-500 p-2 text-white hover:bg-brand-600"
+            }
+            buttonText={<FaIdCard size={24} />}
+          />
+          <ActionButton
             onClick={() => handleUpdate(data)}
             icon={<FaEdit size={24} />}
             color={"blue"}
             label={t("update")}
-        />
-        <ActionButton
+          />
+          <ActionButton
             onClick={() => handleDelete(data.id)}
             icon={<FaTrash size={24} />}
             color={"red"}
             label={t("delete")}
-        />
-        <MediaSourceDialog data={data.id} />
-        <PlayerDialog data={data.id} />
-      </div>
-    );
-  },[props.actionButtons]);
+          />
+          <MediaSourceDialog data={data.id} />
+          <PlayerDialog data={data.id} />
+        </div>
+      );
+    },
+    [props.actionButtons]
+  );
 
-  return (
+  return items.page && (
     <div>
       <MediaDialog
         formik={formik}

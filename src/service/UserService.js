@@ -4,9 +4,18 @@ const defaultUrl = "users";
 
 export class UserService {
 
-  async getAllUsers(params) {
+  async getAll(params) {
     return await createRequest(
       defaultUrl,
+      "GET",
+      null,
+      params
+    );
+  }
+
+  async filter(params) {
+    return await createRequest(
+      defaultUrl + `/filter`,
       "GET",
       null,
       params
