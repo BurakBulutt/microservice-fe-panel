@@ -1,6 +1,6 @@
 import createRequest from "./ApiService";
 
-const defaultUrl = "users";
+const defaultUrl = "/users";
 
 export class UserService {
 

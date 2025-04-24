@@ -37,7 +37,7 @@ const Comment = (props) => {
   const [requestParams, setRequestParams] = useState({
     page: 0,
     size: 10,
-    target: null,
+    target: targetId,
   });
 
   const baseItem = {
@@ -68,9 +68,8 @@ const Comment = (props) => {
   }, [toast]);
 
   const getItems = useCallback(() => {
-    if (targetId) {
       service
-          .getAllByTarget(requestParams, targetId)
+          .filter(requestParams)
           .then((response) => {
             if (response.status === 200) {
               setItems(response.data);
@@ -79,18 +78,7 @@ const Comment = (props) => {
           .catch((error) => {
             catchError(error,{});
           });
-    } else {
-      service
-          .getAll(requestParams)
-          .then((response) => {
-            if (response.status === 200) {
-              setItems(response.data);
-            }
-          })
-          .catch((error) => {
-            catchError(error,{});
-          });
-    }
+    
   }, [requestParams, catchError, service,targetId]);
 
   useEffect(() => {

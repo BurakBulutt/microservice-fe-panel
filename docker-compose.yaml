@@ -1,0 +1,13 @@
+services:
+  app-react-admin:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: app-react-admin
+    ports:
+      - "3000:80"
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024m

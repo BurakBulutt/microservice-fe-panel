@@ -1,6 +1,6 @@
 import createRequest from "./ApiService";
 
-const defaultUrl = "contents";
+const defaultUrl = "/contents";
 
 export class ContentService {
   async getAll(params) {

@@ -1,6 +1,6 @@
 import createRequest from "./ApiService";
 
-const defaultUrl = "medias";
+const defaultUrl = "/medias";
 
 export class MediaService {
   async getAll(params) {
@@ -13,7 +13,7 @@ export class MediaService {
 
   async getMediaSources(id) {
     return await createRequest(
-      defaultUrl + `/media-sources/${id}`,
+      defaultUrl + `/${id}/media-sources`,
       "GET",
       null,
       null
@@ -30,7 +30,7 @@ export class MediaService {
 
   async updateMediaSources(id, request) {
     return await createRequest(
-      defaultUrl + `/media-sources/${id}`,
+      defaultUrl + `/${id}/media-sources`,
       "PUT",
       request,
       null

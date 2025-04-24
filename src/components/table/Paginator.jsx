@@ -101,7 +101,13 @@ const Paginator = ({ table, page }) => {
 };
 
 function propsAreEqual(prevProps, nextProps) {
+
+  console.log("prevTableSize",prevProps.table.getState().pagination.pageSize);
+  console.log("nextTableSize",nextProps.table.getState().pagination.pageSize);
+
   return (
+    prevProps.table.getState().pagination.pageSize === prevProps.page.size &&
+    prevProps.table.getState().pagination.pageIndex === prevProps.page.number &&
     prevProps.page.number === nextProps.page.number &&
     prevProps.page.size === nextProps.page.size &&
     prevProps.page.totalElements === nextProps.page.totalElements &&

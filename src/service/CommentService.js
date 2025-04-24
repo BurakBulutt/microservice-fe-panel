@@ -1,6 +1,6 @@
 import createRequest from "./ApiService";
 
-const defaultUrl = "comments";
+const defaultUrl = "/comments";
 
 export class CommentService {
 
@@ -13,9 +13,9 @@ export class CommentService {
         );
     }
 
-    async getAllByTarget(params,targetId) {
+    async filter(params) {
         return await createRequest(
-            defaultUrl + `/comment/${targetId}`,
+            defaultUrl + `/filter`,
             "GET",
             null,
             params
