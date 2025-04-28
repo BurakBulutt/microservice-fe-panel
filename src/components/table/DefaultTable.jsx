@@ -25,7 +25,6 @@ const DefaultTable = ({
                         handleSelect,
                         actionButtons
                       }) => {
-  console.log("table");
   const { t } = useTranslation();
   const displayEnumVal = useCallback(
     (data, enumType) => {
