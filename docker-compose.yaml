@@ -5,9 +5,13 @@ services:
       dockerfile: Dockerfile
     container_name: app-react-admin
     ports:
-      - "3000:80"
-    deploy:
-      resources:
-        limits:
-          cpus: '1.0'
-          memory: 1024m
+      - "80:80"
+    networks:
+      - app-network
+    cpus: '1'
+    mem_limit: 1024m
+
+networks:
+  app-network:
+    name: app_network_default
+    external: true

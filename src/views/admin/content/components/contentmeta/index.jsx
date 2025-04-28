@@ -362,9 +362,7 @@ const ContentMeta = (props) => {
           <SelectDialog
               extra="w-full rounded-xl bg-gradient-to-br from-[#EA52F8] to-[#0066FF] px-5 py-3 text-base font-medium text-white transition duration-200 hover:shadow-lg hover:shadow-[#0066FF]/25"
               buttonText={t("category")}
-              component={
-                <Category header={header} actionButtons={actionButtons} />
-              }
+              component={<Category header={header()} actionButtons={actionButtons} />}
               onSave={onSave}
               onClose={onClose}
             />

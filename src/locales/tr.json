@@ -81,5 +81,11 @@
   "player" : "Oynatıcı",
   "chosen" : "Seçilen",
   "cantUpdateOrDeleteAdmin" : "Admin Güncellenemez veya Silinemez!",
-  "page" : "Sayfa"
+  "page" : "Sayfa",
+  "importXml" : "XML İçe Aktar",
+  "clickToUpload" : "Yüklemek İçin Tıklayın",
+  "xmlDefinition" : "Xml Definition",
+  "status" : "Durum",
+  "fileName" : "Dosya Adı",
+  "errorMessage" : "Hata Mesajı"
 }

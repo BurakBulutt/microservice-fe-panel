@@ -20,13 +20,21 @@ import IdCard from "../../../components/idcard";
 import { useTranslation } from "react-i18next";
 import { useToast } from "../../../utils/toast/toast";
 import Header from "../../../components/header";
-import SearchBox from "../../../components/searchbox";
 import ActionButton from "../../../components/actionbutton";
+import Card from "components/card";
+import Paginator from "components/table/Paginator";
+
+const service = new UserService();
 
 const Users = (props) => {
   const [items, setItems] = useState({
     content: [],
-    page: null,
+    page: {
+      number: 0,
+      size: 10,
+      totalElements: 0,
+      totalPages: 0,
+    },
   });
   const [selectedItems, setSelectedItems] = useState([]);
   const [dialogVisible, setDialogVisible] = useState(false);
@@ -34,7 +42,6 @@ const Users = (props) => {
     UserCreateValidationSchema
   );
   const { t } = useTranslation();
-  const service = useMemo(() => new UserService(), []);
   const toast = useToast();
   const [requestParams, setRequestParams] = useState({
     page: 0,
@@ -71,9 +78,12 @@ const Users = (props) => {
     },
   });
 
-  const catchError = useCallback((error, options) => {
+  const catchError = useCallback(
+    (error, options) => {
       toast.error(error.message, options);
-  }, [toast]);
+    },
+    [toast]
+  );
 
   const getItems = useCallback(() => {
     service
@@ -86,7 +96,7 @@ const Users = (props) => {
       .catch((error) => {
         catchError(error, {});
       });
-  }, [requestParams, catchError, service]);
+  }, [requestParams, catchError]);
 
   const createItem = (request) => {
     service
@@ -99,7 +109,7 @@ const Users = (props) => {
         }
       })
       .catch((error) => {
-        catchError(error,{});
+        catchError(error, {});
       });
   };
 
@@ -114,7 +124,7 @@ const Users = (props) => {
         }
       })
       .catch((error) => {
-        catchError(error,{});
+        catchError(error, {});
       });
   };
 
@@ -129,7 +139,7 @@ const Users = (props) => {
         }
       })
       .catch((error) => {
-        catchError(error,{});
+        catchError(error, {});
       });
   };
 
@@ -144,7 +154,7 @@ const Users = (props) => {
         }
       })
       .catch((error) => {
-        catchError(error,{});
+        catchError(error, {});
       });
   };
 
@@ -159,19 +169,17 @@ const Users = (props) => {
         }
       })
       .catch((error) => {
-        catchError(error,{});
+        catchError(error, {});
       });
   };
-
 
   useEffect(() => {
     getItems();
   }, [getItems]);
 
-
   const handleSubmitFormik = () => {
     formik.handleSubmit();
-  }
+  };
   const hideDialog = () => {
     formik.resetForm();
     setDialogVisible(false);
@@ -195,7 +203,6 @@ const Users = (props) => {
   const handleResetPassword = (id) => {
     userResetPassword(id);
   };
-
 
   const handleSelect = useCallback((e, items) => {
     if (e.target.checked) {
@@ -234,81 +241,75 @@ const Users = (props) => {
     }
   }, []);
 
-
-  const header = useCallback(() => {
-    return (
-      <div className="flex w-full flex-row items-center justify-between">
-        {props.header ? (
-          props.header()
-        ) : (
-          <Header
-            onBulkDelete={() => console.log(selectedItems)}
-            itemsLength={selectedItems.length}
-            onCreate={handleCreate}
+  const actionButtons = useCallback(
+    (data) => {
+      return props.actionButtons ? (
+        props.actionButtons(data)
+      ) : (
+        <div className="flex space-x-2">
+          <CustomModal
+            title={"ID"}
+            component={<IdCard id={data.id} />}
+            extra={
+              "flex cursor-pointer items-center justify-center rounded-lg bg-brand-500 p-2 text-white hover:bg-brand-600"
+            }
+            buttonText={<FaIdCard size={24} />}
           />
-        )}
-        <SearchBox onKeyDown={searchKeyDown} />
-      </div>
-    );
-  },[selectedItems,props.header]);
+          <ActionButton
+            onClick={() => handleUpdate(data)}
+            icon={<FaEdit size={24} />}
+            color={"blue"}
+            label={t("update")}
+          />
+          <ActionButton
+            onClick={() => handleDelete(data.id)}
+            icon={<FaTrash size={24} />}
+            color={"red"}
+            label={t("delete")}
+          />
+          <ActionButton
+            onClick={() => handleVerify(data.id)}
+            icon={<FaMailBulk size={24} />}
+            color={"yellow"}
+            label={t("emailVerified")}
+          />
+          <ActionButton
+            onClick={() => handleResetPassword(data.id)}
+            icon={<FaUserLock size={24} />}
+            color={"green"}
+            label={t("resetPassword")}
+          />
+        </div>
+      );
+    },
+    [props.actionButtons]
+  );
 
-  const actionButtons = useCallback((data) => {
-    return props.actionButtons ? (
-      props.actionButtons(data)
-    ) : (
-      <div className="flex space-x-2">
-        <CustomModal
-          title={"ID"}
-          component={<IdCard id={data.id} />}
-          extra={"flex cursor-pointer items-center justify-center rounded-lg bg-brand-500 p-2 text-white hover:bg-brand-600"}
-          buttonText={<FaIdCard size={24} />}
-        />
-        <ActionButton
-          onClick={() => handleUpdate(data)}
-          icon={<FaEdit size={24} />}
-          color={"blue"}
-          label={t("update")}
-        />
-        <ActionButton
-          onClick={() => handleDelete(data.id)}
-          icon={<FaTrash size={24} />}
-          color={"red"}
-          label={t("delete")}
-        />
-        <ActionButton
-          onClick={() => handleVerify(data.id)}
-          icon={<FaMailBulk size={24} />}
-          color={"yellow"}
-          label={t("emailVerified")}
-        />
-        <ActionButton
-          onClick={() => handleResetPassword(data.id)}
-          icon={<FaUserLock size={24} />}
-          color={"green"}
-          label={t("resetPassword")}
-        />
-      </div>
-    );
-  },[props.actionButtons]);
-
-  return items.page && (
-    <div>
+  return (
+    <Card extra={"w-full h-full sm:overflow-auto px-6"}>
       <UserDialog
         formik={formik}
         dialogVisible={dialogVisible}
         hideDialog={hideDialog}
         handleSubmitFormik={handleSubmitFormik}
       />
-      <DefaultTable
-        header={header}
+      <Header
+        onBulkDelete={() => console.log(selectedItems)}
+        itemsLength={selectedItems.length}
+        onCreate={handleCreate}
+        searchKeyDown={searchKeyDown}
+        component={props.header}
+      />
+      <DefaultTable 
         columnsData={usersColumnsData}
-        tableData={items}
+        tableData={items.content}
         actionButtons={actionButtons}
         selectedItems={selectedItems}
         handleSelect={handleSelect}
         onPageChange={onPageChange}
       />
-    </div>
+      <Paginator page={items.page} onPageChange={onPageChange} />
+    </Card>
   );
 };
 export default Users;

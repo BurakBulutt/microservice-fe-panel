@@ -1,39 +1,43 @@
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
-import React, { memo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
-const Paginator = ({ table, page }) => {
+const Paginator = ({ page, onPageChange }) => {
   const { t } = useTranslation();
-  const currentPage = table.getState().pagination.pageIndex + 1;
-  const pageCount = table.getPageCount();
-  const isPreviousPage = table.getCanPreviousPage();
-  const isNextPage = table.getCanNextPage();
+  const currentPage = page.number + 1;
+  const pageCount = page.totalPages;
 
-  const getPageNumbers = () => {
+  const isNextPage = currentPage < pageCount;
+  const isPreviousPage = currentPage > 1;
+  
+  const pageNumbers = useMemo(() => {
     const totalPages = pageCount;
     const delta = 2;
     const range = [];
 
-    for (
-      let i = Math.max(1, currentPage - delta);
-      i <= Math.min(totalPages, currentPage + delta);
-      i++
-    ) {
+    for (let i = Math.max(1, currentPage - delta);i <= Math.min(totalPages, currentPage + delta);i++) {
       range.push(i);
     }
 
     return range;
-  };
+  },[currentPage, pageCount]);
 
-  const getPageOptions = () => {
+  const pageSizeOptions = useMemo(() => {
     const base = [1, 10, 20, 50];
-    const totalElements = page.totalElements;
-    const shouldAddTotal = totalElements > Math.max(...base);
+    const shouldAddTotal = page.totalElements > Math.max(...base);
 
-    return shouldAddTotal ? [...base, totalElements] : base;
-  };
+    return shouldAddTotal ? [...base, page.totalElements] : base;
+  },[page.totalElements]);
 
-  const pageNumbers = getPageNumbers();
+
+  const handleSizeChange = useCallback((e) => {
+    const newSize = parseInt(e.target.value, 10);
+    onPageChange(0, newSize);
+  }, [onPageChange]);
+
+  const handlePageChange = useCallback((newPage) => {
+    onPageChange(newPage - 1, page.size);
+  }, [onPageChange, page.size]);
 
   return (
     <div className="mt-4 flex flex-col items-center justify-between gap-3 border-t px-4 py-3 sm:flex-row">
@@ -44,10 +48,10 @@ const Paginator = ({ table, page }) => {
         <select
           aria-label="Page size"
           className="h-9 rounded-xl border border-gray-200 bg-white px-3 text-sm outline-none focus:border-brand-500 dark:border-white/10 dark:bg-navy-900 dark:text-white dark:focus:border-brand-400"
-          value={table.getState().pagination.pageSize}
-          onChange={(e) => table.setPageSize(Number(e.target.value))}
+          value={page.size}
+          onChange={handleSizeChange}
         >
-          {getPageOptions().map((size) => (
+          {pageSizeOptions.map((size) => (
             <option key={size} value={size}>
               {size}
             </option>
@@ -57,7 +61,7 @@ const Paginator = ({ table, page }) => {
 
       <div className="flex items-center space-x-2">
         <button
-          onClick={() => table.previousPage()}
+          onClick={() => handlePageChange(currentPage - 1)}
           disabled={!isPreviousPage}
           className={`flex h-9 w-9 items-center justify-center rounded-full border ${
             isPreviousPage
@@ -69,22 +73,22 @@ const Paginator = ({ table, page }) => {
           <FaAngleLeft size={12} />
         </button>
 
-        {pageNumbers.map((page) => (
+        {pageNumbers.map((pageNum) => (
           <button
-            key={page}
-            onClick={() => table.setPageIndex(page - 1)}
+            key={pageNum}
+            onClick={() => handlePageChange(pageNum)}
             className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold ${
-              page === currentPage
+              pageNum === currentPage
                 ? "bg-brand-500 text-white dark:bg-brand-400"
                 : "border border-gray-300 bg-white text-gray-800 dark:border-gray-400 dark:bg-navy-900 dark:text-white"
             }`}
           >
-            {page}
+            {pageNum}
           </button>
         ))}
 
         <button
-          onClick={() => table.nextPage()}
+          onClick={() => handlePageChange(currentPage + 1)}
           disabled={!isNextPage}
           className={`flex h-9 w-9 items-center justify-center rounded-full border ${
             isNextPage
@@ -100,19 +104,4 @@ const Paginator = ({ table, page }) => {
   );
 };
 
-function propsAreEqual(prevProps, nextProps) {
-
-  console.log("prevTableSize",prevProps.table.getState().pagination.pageSize);
-  console.log("nextTableSize",nextProps.table.getState().pagination.pageSize);
-
-  return (
-    prevProps.table.getState().pagination.pageSize === prevProps.page.size &&
-    prevProps.table.getState().pagination.pageIndex === prevProps.page.number &&
-    prevProps.page.number === nextProps.page.number &&
-    prevProps.page.size === nextProps.page.size &&
-    prevProps.page.totalElements === nextProps.page.totalElements &&
-    prevProps.page.totalPages === nextProps.page.totalPages
-  );
-}
-
-export default memo(Paginator,propsAreEqual);
+export default Paginator;

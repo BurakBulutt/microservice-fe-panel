@@ -80,4 +80,3 @@ export const CommentCreateValidationSchema = Yup.object({
 export const CommentUpdateValidationSchema = Yup.object({
   content: Yup.string().required("Content is Required"),
 });
-

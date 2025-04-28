@@ -8,3 +8,13 @@ export const ContentTypeEnum = {
         display: "movie"
     }
 };
+export const XmlDefinitionType = {
+    CONTENT: {
+        value: "CONTENT",
+        display: "content"
+    },
+    MEDIA: {
+        value: "MEDIA",
+        display: "media"
+    }
+};

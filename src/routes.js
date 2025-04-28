@@ -26,6 +26,8 @@ import Comment from "./views/admin/comment";
 import Category from "./views/admin/category";
 import { SiContentful } from "react-icons/si";
 import { BiCategory, BiComment, BiUser } from "react-icons/bi";
+import { FaDochub } from "react-icons/fa";
+import XmlDefinition from "views/admin/xmldefination";
 
 const routes = [
   {
@@ -76,6 +78,13 @@ const routes = [
     path: "categories",
     icon: <BiCategory className="h-6 w-6" />,
     component: <Category />,
+  },
+  {
+    name: "xmlDefinition",
+    layout: "/admin",
+    path: "xml-definition",
+    icon: <FaDochub className="h-6 w-6" />,
+    component: <XmlDefinition />,
   },
 ];
 const oldRoutes = [

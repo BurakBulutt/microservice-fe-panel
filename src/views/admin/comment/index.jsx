@@ -1,5 +1,5 @@
 import DefaultTable from "../../../components/table/DefaultTable";
-import React, {useCallback, useEffect, useMemo, useState} from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { commentColumnsData } from "../../../components/table/columnsData";
 import { CommentService } from "../../../service/CommentService";
 import { FaEdit, FaIdCard, FaTrash } from "react-icons/fa";
@@ -18,16 +18,23 @@ import {
 
 import ActionButton from "../../../components/actionbutton";
 import Header from "../../../components/header";
-import SearchBox from "../../../components/searchbox";
+import Card from "components/card";
+import Paginator from "components/table/Paginator";
+
+const service = new CommentService();
 
 const Comment = (props) => {
   const { targetId } = props;
   const [items, setItems] = useState({
     content: [],
-    page: null,
+    page: {
+      number: 0,
+      size: 10,
+      totalElements: 0,
+      totalPages: 0,
+    },
   });
   const [selectedItems, setSelectedItems] = useState([]);
-  const service = useMemo(() => new CommentService(),[]);
   const { t } = useTranslation();
   const toast = useToast();
   const [validationSchema, setValidationSchema] = useState(
@@ -63,23 +70,25 @@ const Comment = (props) => {
     },
   });
 
-  const catchError = useCallback((error, options) => {
-    toast.error(error.message, options);
-  }, [toast]);
+  const catchError = useCallback(
+    (error, options) => {
+      toast.error(error.message, options);
+    },
+    [toast]
+  );
 
   const getItems = useCallback(() => {
-      service
-          .filter(requestParams)
-          .then((response) => {
-            if (response.status === 200) {
-              setItems(response.data);
-            }
-          })
-          .catch((error) => {
-            catchError(error,{});
-          });
-    
-  }, [requestParams, catchError, service,targetId]);
+    service
+      .filter(requestParams)
+      .then((response) => {
+        if (response.status === 200) {
+          setItems(response.data);
+        }
+      })
+      .catch((error) => {
+        catchError(error, {});
+      });
+  }, [requestParams, catchError]);
 
   useEffect(() => {
     getItems();
@@ -91,12 +100,12 @@ const Comment = (props) => {
       .then((response) => {
         if (response.status === 201) {
           toast.success(t("success"), {
-            onClose: getItems
+            onClose: getItems,
           });
         }
       })
       .catch((error) => {
-        catchError(error,{});
+        catchError(error, {});
       });
   };
 
@@ -105,30 +114,30 @@ const Comment = (props) => {
       .update(request.id, request)
       .then((response) => {
         if (response.status === 204) {
-          toast.success(t("success"),{
-            onClose: getItems
+          toast.success(t("success"), {
+            onClose: getItems,
           });
         }
       })
       .catch((error) => {
-        catchError(error,{});
+        catchError(error, {});
       });
   };
 
   const deleteItem = (id) => {
     service
-        .delete(id)
-        .then((response) => {
-          if (response.status === 204) {
-            toast.success(t("success"), {
-              onClose: getItems
-            });
-          }
-        })
-        .catch((error) => {
-          catchError(error,{});
-        });
-  }
+      .delete(id)
+      .then((response) => {
+        if (response.status === 204) {
+          toast.success(t("success"), {
+            onClose: getItems,
+          });
+        }
+      })
+      .catch((error) => {
+        catchError(error, {});
+      });
+  };
 
   const handleSubmitFormik = () => {
     if (formik.values.type === "COMMENT") {
@@ -160,15 +169,15 @@ const Comment = (props) => {
   const handleSelect = useCallback((e, items) => {
     if (e.target.checked) {
       setSelectedItems((prev) =>
-          Array.isArray(items)
-              ? [...new Set([...prev, ...items])]
-              : [...prev, items]
+        Array.isArray(items)
+          ? [...new Set([...prev, ...items])]
+          : [...prev, items]
       );
     } else {
       setSelectedItems((prev) =>
-          Array.isArray(items)
-              ? prev.filter((item) => !items.includes(item))
-              : prev.filter((item) => item !== items)
+        Array.isArray(items)
+          ? prev.filter((item) => !items.includes(item))
+          : prev.filter((item) => item !== items)
       );
     }
   }, []);
@@ -198,51 +207,37 @@ const Comment = (props) => {
     }
   }, []);
 
-  const header = useCallback(() => {
-    return (
-        <div className="flex w-full flex-row items-center justify-between">
-          {props.header ? (
-              props.header()
-          ) : (
-              <Header
-                  onBulkDelete={() => console.log(selectedItems)}
-                  itemsLength={selectedItems.length}
-                  onCreate={handleCreate}
-              />
-          )}
-          <SearchBox onKeyDown={searchKeyDown} />
-        </div>
-    );
-  },[selectedItems,props.header]);
-
-  const actionButtons = useCallback((data) => {
-    return props.actionButtons ? (
-      props.actionButtons(data)
-    ) : (
-      <div className="flex space-x-2">
-        <CustomModal
-          title={"ID"}
-          component={<IdCard id={data.id} />}
-          extra={
-            "flex cursor-pointer items-center justify-center rounded-lg bg-brand-500 p-2 text-white hover:bg-brand-600"
-          }
-          buttonText={<FaIdCard size={24} />}
-        />
-        <ActionButton
+  const actionButtons = useCallback(
+    (data) => {
+      return props.actionButtons ? (
+        props.actionButtons(data)
+      ) : (
+        <div className="flex space-x-2">
+          <CustomModal
+            title={"ID"}
+            component={<IdCard id={data.id} />}
+            extra={
+              "flex cursor-pointer items-center justify-center rounded-lg bg-brand-500 p-2 text-white hover:bg-brand-600"
+            }
+            buttonText={<FaIdCard size={24} />}
+          />
+          <ActionButton
             onClick={() => handleUpdate(data)}
             icon={<FaEdit size={24} />}
             color={"blue"}
             label={t("update")}
-        />
-        <ActionButton
+          />
+          <ActionButton
             onClick={() => handleDelete(data.id)}
             icon={<FaTrash size={24} />}
             color={"red"}
             label={t("delete")}
-        />
-      </div>
-    );
-  },[props.actionButtons]);
+          />
+        </div>
+      );
+    },
+    [props.actionButtons]
+  );
 
   const modalComponent = useCallback((data, accessor) => {
     switch (accessor) {
@@ -261,27 +256,33 @@ const Comment = (props) => {
       default:
         return <></>;
     }
-  },[]);
+  }, []);
 
-  return items.page && (
-    <>
+  return (
+    <Card extra={"w-full h-full sm:overflow-auto px-6"}>
       <CommentDialog
         formik={formik}
         dialogVisible={dialogVisible}
         hideDialog={hideDialog}
         handleSubmitFormik={handleSubmitFormik}
       />
+      <Header
+        onBulkDelete={() => console.log(selectedItems)}
+        itemsLength={selectedItems.length}
+        onCreate={handleCreate}
+        searchKeyDown={searchKeyDown}
+      />
       <DefaultTable
-        header={header}
         columnsData={commentColumnsData}
-        tableData={items}
-        selectedItems={selectedItems}
+        tableData={items.content}
         actionButtons={actionButtons}
+        selectedItems={selectedItems}
         handleSelect={handleSelect}
         onPageChange={onPageChange}
         modalComponent={modalComponent}
       />
-    </>
+      <Paginator page={items.page} onPageChange={onPageChange} />
+    </Card>
   );
 };
 

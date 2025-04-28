@@ -14,19 +14,27 @@ import { useToast } from "../../../../../utils/toast/toast";
 import { useTranslation } from "react-i18next";
 
 import Header from "../../../../../components/header";
-import SearchBox from "../../../../../components/searchbox";
 import ActionButton from "../../../../../components/actionbutton";
+import Card from "components/card";
+import Paginator from "components/table/Paginator";
+import XmlImportDialog from "../xmlimport";
+
+const service = new MediaService();
 
 const Media = (props) => {
   const { contentId } = props;
   const [items, setItems] = useState({
     content: [],
-    page: null,
+    page: {
+      number: 0,
+      size: 10,
+      totalElements: 0,
+      totalPages: 0,
+    },
   });
   const [selectedItems, setSelectedItems] = useState([]);
   const [dialogVisible, setDialogVisible] = useState(false);
   const { t } = useTranslation();
-  const service = useMemo(() => new MediaService(), []);
   const toast = useToast();
   const [requestParams, setRequestParams] = useState({
     page: 0,
@@ -77,7 +85,7 @@ const Media = (props) => {
       .catch((error) => {
         catchError(error, {});
       });
-  }, [requestParams, catchError, service, contentId]);
+  }, [requestParams, catchError]);
 
   const createItem = (request) => {
     service
@@ -184,27 +192,14 @@ const Media = (props) => {
       setRequestParams((prevState) => ({
         ...prevState,
         page: 0,
-        username: value ? value : null,
+        name: value ? value : null,
       }));
     }
   }, []);
 
-  const header = useCallback(() => {
-    return (
-      <div className="flex w-full flex-row items-center justify-between">
-        {props.header ? (
-          props.header()
-        ) : (
-          <Header
-            onBulkDelete={() => console.log(selectedItems)}
-            itemsLength={selectedItems.length}
-            onCreate={handleCreate}
-          />
-        )}
-        <SearchBox onKeyDown={searchKeyDown} />
-      </div>
-    );
-  }, [selectedItems, props.header]);
+  const importXmlButton = useMemo(() => {
+    return <XmlImportDialog type={"MEDIA"}/>;
+  }, []);
 
   const actionButtons = useCallback(
     (data) => {
@@ -240,24 +235,32 @@ const Media = (props) => {
     [props.actionButtons]
   );
 
-  return items.page && (
-    <div>
+  return (
+    <Card extra={"w-full h-full sm:overflow-auto px-6"}>
       <MediaDialog
         formik={formik}
         dialogVisible={dialogVisible}
         hideDialog={hideDialog}
         handleSubmitFormik={handleSubmitFormik}
       />
+      <Header
+        onBulkDelete={() => console.log(selectedItems)}
+        itemsLength={selectedItems.length}
+        onCreate={handleCreate}
+        searchKeyDown={searchKeyDown}
+        component={props.header}
+        extra={importXmlButton}
+      />
       <DefaultTable
-        header={header}
         columnsData={mediaColumnsData}
-        tableData={items}
-        selectedItems={selectedItems}
+        tableData={items.content}
         actionButtons={actionButtons}
+        selectedItems={selectedItems}
         handleSelect={handleSelect}
         onPageChange={onPageChange}
       />
-    </div>
+      <Paginator page={items.page} onPageChange={onPageChange} />
+    </Card>
   );
 };
 export default Media;

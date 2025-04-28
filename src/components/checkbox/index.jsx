@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 const Checkbox = (props) => {
   const { extra, color, ...rest } = props;
   return (
@@ -43,4 +45,4 @@ const Checkbox = (props) => {
   );
 };
 
-export default Checkbox;
+export default memo(Checkbox);

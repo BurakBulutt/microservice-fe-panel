@@ -1,11 +1,8 @@
 import DefaultTable from "../../../components/table/DefaultTable";
-import { categoryColumnsData } from "../../../components/table/columnsData";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { FaEdit, FaIdCard, FaTrash } from "react-icons/fa";
+import { xmlDefinitionColumnsData } from "../../../components/table/columnsData";
+import React, { useCallback, useEffect, useState } from "react";
+import { FaIdCard, FaTrash } from "react-icons/fa";
 import { useFormik } from "formik";
-import { CategoryValidationSchema } from "../../../utils/validation/ValidationSchemas";
-import CategoryDialog from "./components/dialog";
-import { CategoryService } from "../../../service/CategoryService";
 import CustomModal from "../../../components/modal";
 import IdCard from "../../../components/idcard";
 import { useTranslation } from "react-i18next";
@@ -15,10 +12,13 @@ import Header from "../../../components/header";
 import ActionButton from "../../../components/actionbutton";
 import Card from "components/card";
 import Paginator from "components/table/Paginator";
+import { XmlDefinitionService } from "service/XmlDefinitionService";
+import * as Yup from "yup";
+import XmlDefinitionDialog from "./components/dialog";
 
-const service = new CategoryService();
+const service = new XmlDefinitionService();
 
-const Category = (props) => {
+const XmlDefinition = (props) => {
   const [items, setItems] = useState({
     content: [],
     page: {
@@ -35,26 +35,23 @@ const Category = (props) => {
   const [requestParams, setRequestParams] = useState({
     page: 0,
     size: 10,
-    name: null,
   });
 
   const baseItem = {
-    name: "",
-    description: "",
-    slug: "",
+    type: "CONTENT",
+    base64: null,
   };
   const formik = useFormik({
     initialValues: baseItem,
-    validationSchema: CategoryValidationSchema,
+    validationSchema: Yup.object({
+      type: Yup.string().required("Type is Required"),
+      base64: Yup.string().required("File is Required"),
+    }),
     validateOnBlur: false,
     validateOnChange: false,
     validateOnMount: false,
     onSubmit: (values) => {
-      if (values.id) {
-        updateItem(values.id, values);
-      } else {
-        createItem(values);
-      }
+      importXmlDefinition(values)
     },
   });
 
@@ -67,7 +64,7 @@ const Category = (props) => {
 
   const getItems = useCallback(() => {
     service
-      .filter(requestParams)
+      .getAll(requestParams)
       .then((response) => {
         if (response.status === 200) {
           setItems(response.data);
@@ -78,37 +75,22 @@ const Category = (props) => {
       });
   }, [requestParams, catchError]);
 
-  const createItem = (request) => {
+  const importXmlDefinition = (request) => {
     service
-      .create(request)
-      .then((response) => {
-        if (response.status === 201) {
-          toast.success(t("success"), {
-            onClose: getItems,
-          });
-          hideDialog();
-        }
-      })
-      .catch((error) => {
-        catchError(error, {});
-      });
+    .import(request)
+    .then((response) => {
+      if (response.status === 201) {
+        toast.success(t("success"), {
+          onClose: getItems,
+        });
+        hideDialog();
+      }
+    })
+    .catch((error) => {
+      catchError(error, {});
+    });
   };
-  const updateItem = (id, request) => {
-    service
-      .update(id, request)
-      .then((response) => {
-        if (response.status === 204) {
-          toast.success(t("success"), {
-            onClose: getItems,
-          });
-          hideDialog();
-        }
-      })
-      .catch((error) => {
-        catchError(error, {});
-      });
-  };
-  const deleteItem = (id) => {
+  const deleteXmlDefinition = (id) => {
     service
       .delete(id)
       .then((response) => {
@@ -139,13 +121,8 @@ const Category = (props) => {
     formik.setValues(baseItem);
     setDialogVisible(true);
   };
-  const handleUpdate = (data) => {
-    formik.resetForm();
-    formik.setValues(data);
-    setDialogVisible(true);
-  };
   const handleDelete = (id) => {
-    deleteItem(id);
+    deleteXmlDefinition(id);
   };
 
   const handleSelect = useCallback((e, items) => {
@@ -176,12 +153,6 @@ const Category = (props) => {
   const searchKeyDown = useCallback((e) => {
     if (e.key === "Enter") {
       const value = e.target.value.trim();
-
-      setRequestParams((prevState) => ({
-        ...prevState,
-        page: 0,
-        name: value ? value : null,
-      }));
     }
   }, []);
 
@@ -200,12 +171,6 @@ const Category = (props) => {
             buttonText={<FaIdCard size={24} />}
           />
           <ActionButton
-            onClick={() => handleUpdate(data)}
-            icon={<FaEdit size={24} />}
-            color={"blue"}
-            label={t("update")}
-          />
-          <ActionButton
             onClick={() => handleDelete(data.id)}
             icon={<FaTrash size={24} />}
             color={"red"}
@@ -217,9 +182,17 @@ const Category = (props) => {
     [props.actionButtons]
   );
 
+  const modalComponent = useCallback((data, accessor) => {
+    return (
+      <p className="text-inherit block font-sans text-xl font-normal leading-relaxed text-navy-800 antialiased dark:text-white">
+        {data}
+      </p>
+    );
+  }, []);
+
   return (
     <Card extra={"w-full h-full sm:overflow-auto px-6"}>
-      <CategoryDialog
+      <XmlDefinitionDialog
         formik={formik}
         dialogVisible={dialogVisible}
         hideDialog={hideDialog}
@@ -233,16 +206,17 @@ const Category = (props) => {
         component={props.header}
       />
       <DefaultTable
-        columnsData={categoryColumnsData}
+        columnsData={xmlDefinitionColumnsData}
         tableData={items.content}
         actionButtons={actionButtons}
         selectedItems={selectedItems}
         handleSelect={handleSelect}
         onPageChange={onPageChange}
+        modalComponent={modalComponent}
       />
       <Paginator page={items.page} onPageChange={onPageChange} />
     </Card>
   );
 };
 
-export default Category;
+export default XmlDefinition;

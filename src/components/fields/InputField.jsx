@@ -14,6 +14,7 @@ function InputField(props) {
     value,
     onChange,
     name,
+    accept
   } = props;
 
   return (
@@ -30,9 +31,10 @@ function InputField(props) {
         name={name}
         disabled={disabled}
         type={type}
+        accept={accept}
         id={id}
         placeholder={placeholder}
-        className={`mt-2 flex h-12 w-full items-center justify-center rounded-xl border bg-white/0 p-3 text-sm outline-none ${
+        className={`mt-2 flex h-12 w-full items-center justify-center rounded-xl border bg-white/0 p-3 text-sm outline-none file:mr-4 file:rounded-md file:border-0 file:bg-brand-500 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-brand-600 dark:file:bg-brand-400 dark:hover:file:bg-brand-300 ${
           disabled === true
             ? state === "error"
               ? "border-red-500 bg-gray-100 text-red-500 placeholder:text-red-500 dark:!border-red-400 dark:!text-red-400 dark:placeholder:!text-red-400"

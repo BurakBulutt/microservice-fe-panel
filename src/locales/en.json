@@ -81,5 +81,11 @@
   "player" : "Player",
   "chosen" : "Chosen",
   "cantUpdateOrDeleteAdmin" : "Can Not Update or Delete Admin!",
-  "page" : "Page"
+  "page" : "Page",
+  "importXml" : "Import XML",
+  "clickToUpload" : "Click to Upload",
+  "xmlDefinition" : "Xml Definition",
+  "status" : "Status",
+  "fileName" : "File Name",
+  "errorMessage" : "Error Message"
 }
