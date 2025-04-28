@@ -41,13 +41,14 @@ const Media = (props) => {
     size: 10,
     name: null,
     content: contentId,
+    sort:"count,asc"
   });
 
   const baseItem = {
     name: "",
     description: "",
-    count: undefined,
-    publishDate: undefined,
+    count: null,
+    publishDate: null,
     contentId: "",
     slug: "",
     mediaSourceList: [],
