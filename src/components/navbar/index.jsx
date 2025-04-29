@@ -6,7 +6,6 @@ import { Link } from "react-router-dom";
 import { FiSearch } from "react-icons/fi";
 import { RiMoonFill, RiSunFill } from "react-icons/ri";
 
-import avatar from "assets/img/avatars/avatar4.png";
 import i18n from "i18next";
 import { useTranslation } from "react-i18next";
 
@@ -14,7 +13,7 @@ const Navbar = (props) => {
   const { onOpenSidenav, currentRoute, keycloak, breadCrumb } = props;
   const [darkmode, setDarkmode] = React.useState(false);
   const [userProfile, setUserProfile] = useState({});
-  const [locale, setLocale] = useState("tr");
+  const [locale, setLocale] = useState(i18n.language);
   const { t } = useTranslation();
 
   React.useEffect(() => {

@@ -5,10 +5,15 @@ import MainDashboard from "views/admin/default";
 import NFTMarketplace from "views/admin/marketplace";
 import Profile from "views/admin/profile";
 import DataTables from "views/admin/tables";
-import RTLDefault from "views/rtl/default";
+import Users from "./views/admin/users";
+import Content from "./views/admin/content";
+import ContentCard from "./views/admin/content/components/contentcard";
+import Comment from "./views/admin/comment";
+import Category from "./views/admin/category";
+import XmlDefinition from "views/admin/xmldefination";
 
 // Auth Imports
-import SignIn from "views/auth/SignIn";
+import SignIn from "./views/auth/signin";
 
 // Icon Imports
 import {
@@ -18,16 +23,10 @@ import {
   MdPerson,
   MdLock,
 } from "react-icons/md";
-
-import Users from "./views/admin/users";
-import Content from "./views/admin/content";
-import ContentCard from "./views/admin/content/components/contentcard";
-import Comment from "./views/admin/comment";
-import Category from "./views/admin/category";
 import { SiContentful } from "react-icons/si";
 import { BiCategory, BiComment, BiUser } from "react-icons/bi";
 import { FaDochub } from "react-icons/fa";
-import XmlDefinition from "views/admin/xmldefination";
+
 
 const routes = [
   {
@@ -115,13 +114,7 @@ const oldRoutes = [
     path: "sign-in",
     icon: <MdLock className="h-6 w-6" />,
     component: <SignIn />,
-  },
-  {
-    name: "RTL Admin",
-    layout: "/rtl",
-    path: "rtl",
-    icon: <MdHome className="h-6 w-6" />,
-    component: <RTLDefault />,
-  },
+  }
 ];
+
 export default routes;

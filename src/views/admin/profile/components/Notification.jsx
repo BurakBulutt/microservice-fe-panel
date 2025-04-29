@@ -13,7 +13,7 @@ function Notification() {
         <CardMenu />
       </div>
       <div className="flex flex-col">
-        {/* the custom checkbox desing added in src/index.js */}
+        {/* the custom checkbox desing added in src/index.jsx */}
         <div className="mt-3 flex items-center gap-3">
           <Switch id="switch1" />
           <label
